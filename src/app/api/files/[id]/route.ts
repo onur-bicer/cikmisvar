@@ -76,7 +76,7 @@ export async function DELETE(
         }
 
         // Only admin or uploader can delete
-        if (session.user.role !== "admin" && file.uploaderId !== session.user.id) {
+        if (session.user.role !== "ADMIN" && file.uploaderId !== session.user.id) {
             return NextResponse.json({ message: "Forbidden" }, { status: 403 });
         }
 
