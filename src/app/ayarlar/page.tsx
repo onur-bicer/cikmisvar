@@ -1,6 +1,6 @@
 "use client";
 
-import { useAuthStore } from "@/store";
+import { useSession } from "next-auth/react";
 import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
 import { Button } from "@/components/ui/button";
@@ -16,7 +16,7 @@ import { Bell, Shield, User, Monitor, Save } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 
 export default function SettingsPage() {
-    const { user } = useAuthStore();
+    const { data: session, status } = useSession();
     const router = useRouter();
     const { theme, setTheme } = useTheme();
     const { toast } = useToast();
@@ -24,10 +24,10 @@ export default function SettingsPage() {
 
     useEffect(() => {
         setMounted(true);
-        if (!user) {
+        if (status === "unauthenticated") {
             router.push("/");
         }
-    }, [user, router]);
+    }, [status, router]);
 
     const handleSave = () => {
         toast({
@@ -36,7 +36,10 @@ export default function SettingsPage() {
         });
     };
 
-    if (!mounted || !user) return null;
+    if (!mounted || status === "loading") return null;
+    if (!session?.user) return null;
+
+    const user = session.user;
 
     return (
         <div className="flex min-h-screen flex-col">
@@ -73,11 +76,11 @@ export default function SettingsPage() {
                                 <CardContent className="space-y-4">
                                     <div className="grid gap-2">
                                         <Label htmlFor="name">Ad Soyad</Label>
-                                        <Input id="name" defaultValue={user.name} />
+                                        <Input id="name" defaultValue={user.name || ""} />
                                     </div>
                                     <div className="grid gap-2">
                                         <Label htmlFor="email">E-posta</Label>
-                                        <Input id="email" defaultValue={user.email} disabled />
+                                        <Input id="email" defaultValue={user.email || ""} disabled />
                                         <p className="text-xs text-muted-foreground">E-posta adresi değiştirilemez.</p>
                                     </div>
                                 </CardContent>

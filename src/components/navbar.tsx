@@ -106,6 +106,12 @@ export function Navbar() {
                                             <User className="mr-2 h-4 w-4" />
                                             <span>Profil</span>
                                         </DropdownMenuItem>
+                                        {(user as any).role === "admin" && (
+                                            <DropdownMenuItem onClick={() => router.push("/admin")}>
+                                                <Settings className="mr-2 h-4 w-4" />
+                                                <span>Yönetim Paneli</span>
+                                            </DropdownMenuItem>
+                                        )}
                                         <DropdownMenuItem onClick={() => router.push("/ayarlar")}>
                                             <Settings className="mr-2 h-4 w-4" />
                                             <span>Ayarlar</span>

@@ -14,7 +14,8 @@ import { AuthModal } from "@/components/auth-modal";
 import { UploadModal } from "@/components/upload-modal";
 import { PreviewModal } from "@/components/preview-modal";
 import { Toaster } from "@/components/ui/toaster";
-import { useAuthStore, useModalStore, useSearchStore, useFileStore } from "@/store";
+import { useSession } from "next-auth/react";
+import { useModalStore, useSearchStore, useFileStore } from "@/store";
 import { formatFileSize, formatExamType } from "@/lib/utils";
 
 interface University {
@@ -34,6 +35,7 @@ interface Course {
 }
 
 export default function ContentsPage() {
+    const { data: session } = useSession();
     const searchParams = useSearchParams();
     const {
         query, setQuery,

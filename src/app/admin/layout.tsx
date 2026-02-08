@@ -48,6 +48,18 @@ export default function AdminLayout({
                             Dersler
                         </Button>
                     </Link>
+                    <Link href="/admin/files">
+                        <Button variant="ghost" className="w-full justify-start gap-3">
+                            <FileText className="h-4 w-4" />
+                            Dosyalar
+                        </Button>
+                    </Link>
+                    <Link href="/admin/users">
+                        <Button variant="ghost" className="w-full justify-start gap-3">
+                            <Settings className="h-4 w-4" />
+                            Kullanıcılar
+                        </Button>
+                    </Link>
                     <div className="pt-4 mt-4 border-t">
                         <Link href="/">
                             <Button variant="outline" className="w-full justify-start gap-3">
