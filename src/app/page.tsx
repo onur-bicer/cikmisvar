@@ -232,7 +232,10 @@ export default function Home() {
                             </div>
 
                             <div className="flex flex-col sm:flex-row gap-4 pt-4">
-                                <Button size="lg" className="h-14 px-8 text-lg rounded-xl bg-blue-600 hover:bg-blue-700 hover:scale-105 transition-all duration-300 shadow-lg shadow-blue-600/20" onClick={() => router.push("/icerikler")}>
+                                <Button size="lg" className="h-14 px-8 text-lg rounded-xl bg-blue-600 hover:bg-blue-700 hover:scale-105 transition-all duration-300 shadow-lg shadow-blue-600/20" onClick={() => {
+                                    searchRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+                                    setSearchFocused(true);
+                                }}>
                                     Hemen Başla
                                 </Button>
                                 <Button size="lg" variant="outline" className="h-14 px-8 text-lg rounded-xl border-2 hover:bg-gray-50 hover:border-blue-200 hover:text-blue-600 transition-all duration-300" onClick={() => router.push("/icerikler")}>
