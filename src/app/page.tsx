@@ -283,25 +283,6 @@ export default function Home() {
                                 )}
                             </div>
 
-                            <div className="mb-4 text-center">
-                                <span className="text-sm font-medium text-muted-foreground">PopÃ¼ler Aramalar</span>
-                            </div>
-
-                            <div className="flex flex-wrap justify-center gap-2">
-                                {popularSearches.map((chip) => (
-                                    <button
-                                        key={chip.id}
-                                        onClick={() => handleChipClick(chip)}
-                                        className={`inline-flex items-center rounded-full border px-3 py-1 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foregroundfocus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 ${activeChip === chip.id
-                                            ? "bg-primary/10 text-primary border-primary/20"
-                                            : "bg-background text-muted-foreground border-border"
-                                            }`}
-                                    >
-                                        {chip.label}
-                                    </button>
-                                ))}
-                            </div>
-
                             {/* Recommended Section for Logged In Users */}
                             {session?.user && recommendedFiles.length > 0 && (
                                 <div className="mb-12 animate-fade-in text-left">
@@ -346,6 +327,25 @@ export default function Home() {
                                     </div>
                                 </div>
                             )}
+                            <div className="mb-4 text-center">
+                                <span className="text-sm font-medium text-muted-foreground">PopÃ¼ler Aramalar</span>
+                            </div>
+
+                            <div className="flex flex-wrap justify-center gap-2">
+                                {popularSearches.map((chip) => (
+                                    <button
+                                        key={chip.id}
+                                        onClick={() => handleChipClick(chip)}
+                                        className={`inline-flex items-center rounded-full border px-3 py-1 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foregroundfocus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 ${activeChip === chip.id
+                                            ? "bg-primary/10 text-primary border-primary/20"
+                                            : "bg-background text-muted-foreground border-border"
+                                            }`}
+                                    >
+                                        {chip.label}
+                                    </button>
+                                ))}
+                            </div>
+
                         </div>
                     </div>
 
