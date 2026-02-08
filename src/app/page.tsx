@@ -23,7 +23,7 @@ export default function Home() {
     const { user } = useAuthStore();
     const { openAuthModal, openUploadModal } = useModalStore();
     const { query, setQuery, setActiveChip, activeChip } = useSearchStore();
-    const { files } = useFileStore();
+    const { files, fetchFiles } = useFileStore();
     const [mounted, setMounted] = useState(false);
     const [searchFocused, setSearchFocused] = useState(false);
     const searchRef = useRef<HTMLDivElement>(null);
@@ -79,7 +79,8 @@ export default function Home() {
 
     useEffect(() => {
         setMounted(true);
-    }, []);
+        fetchFiles(); // Fetch files from database on mount
+    }, [fetchFiles]);
 
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();

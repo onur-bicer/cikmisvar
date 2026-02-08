@@ -15,8 +15,23 @@ import { UploadModal } from "@/components/upload-modal";
 import { PreviewModal } from "@/components/preview-modal";
 import { Toaster } from "@/components/ui/toaster";
 import { useAuthStore, useModalStore, useSearchStore, useFileStore } from "@/store";
-import { universities } from "@/data/universities";
 import { formatFileSize, formatExamType } from "@/lib/utils";
+
+interface University {
+    id: string;
+    name: string;
+    city: string;
+}
+
+interface Department {
+    id: string;
+    name: string;
+}
+
+interface Course {
+    id: string;
+    name: string;
+}
 
 export default function ContentsPage() {
     const searchParams = useSearchParams();
@@ -30,11 +45,62 @@ export default function ContentsPage() {
         resetFilters
     } = useSearchStore();
 
-    const { files } = useFileStore();
-
+    const { files, loading: filesLoading, fetchFiles } = useFileStore();
     const { openPreviewModal } = useModalStore();
     const [mounted, setMounted] = useState(false);
-    const [loading, setLoading] = useState(true);
+
+    // Data from API
+    const [universities, setUniversities] = useState<University[]>([]);
+    const [departments, setDepartments] = useState<Department[]>([]);
+    const [courses, setCourses] = useState<Course[]>([]);
+    const [loadingData, setLoadingData] = useState(false);
+
+    // Fetch universities on mount
+    useEffect(() => {
+        const fetchUniversities = async () => {
+            try {
+                const res = await fetch("/api/universities");
+                const data = await res.json();
+                setUniversities(data);
+            } catch (error) {
+                console.error("Failed to fetch universities:", error);
+            }
+        };
+        fetchUniversities();
+    }, []);
+
+    // Fetch departments when university changes
+    useEffect(() => {
+        if (selectedUniversityId) {
+            setLoadingData(true);
+            setDepartments([]);
+            setCourses([]);
+
+            fetch(`/api/universities?universityId=${selectedUniversityId}`)
+                .then(res => res.json())
+                .then(data => {
+                    setDepartments(data);
+                    setLoadingData(false);
+                })
+                .catch(() => setLoadingData(false));
+        }
+    }, [selectedUniversityId]);
+
+    // Fetch courses when department changes
+    useEffect(() => {
+        if (selectedDepartmentId) {
+            setLoadingData(true);
+            setCourses([]);
+
+            fetch(`/api/universities?departmentId=${selectedDepartmentId}`)
+                .then(res => res.json())
+                .then(data => {
+                    setCourses(data);
+                    setLoadingData(false);
+                })
+                .catch(() => setLoadingData(false));
+        }
+    }, [selectedDepartmentId]);
 
     // Initialize from URL params if present
     useEffect(() => {
@@ -43,22 +109,9 @@ export default function ContentsPage() {
         if (initialQuery) {
             setQuery(initialQuery);
         }
-    }, [searchParams, setQuery]);
-
-    // Simulate loading delay for realistic feel
-    useEffect(() => {
-        setLoading(true);
-        const timer = setTimeout(() => {
-            setLoading(false);
-        }, 600);
-        return () => clearTimeout(timer);
-    }, [query, selectedUniversityId, selectedDepartmentId, selectedCourseId, year, examType, files]);
-
-    // Derived state for dropdowns
-    const selectedUni = universities.find(u => u.id === selectedUniversityId);
-    const departments = selectedUni?.departments || [];
-    const selectedDep = departments.find(d => d.id === selectedDepartmentId);
-    const courses = selectedDep?.courses || [];
+        // Fetch files on mount
+        fetchFiles();
+    }, [searchParams, setQuery, fetchFiles]);
 
     // Filter and Sort logic
     const filteredFiles = useMemo(() => {
@@ -137,7 +190,11 @@ export default function ContentsPage() {
                                 </div>
 
                                 <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 items-center">
-                                    <Select value={selectedUniversityId} onValueChange={setUniversity}>
+                                    <Select value={selectedUniversityId} onValueChange={(val) => {
+                                        setUniversity(val);
+                                        setDepartment("");
+                                        setCourse("");
+                                    }}>
                                         <SelectTrigger className="bg-background">
                                             <SelectValue placeholder="Üniversite" />
                                         </SelectTrigger>
@@ -148,9 +205,12 @@ export default function ContentsPage() {
                                         </SelectContent>
                                     </Select>
 
-                                    <Select value={selectedDepartmentId} onValueChange={setDepartment} disabled={!selectedUniversityId}>
+                                    <Select value={selectedDepartmentId} onValueChange={(val) => {
+                                        setDepartment(val);
+                                        setCourse("");
+                                    }} disabled={!selectedUniversityId || loadingData}>
                                         <SelectTrigger className="bg-background">
-                                            <SelectValue placeholder="Bölüm" />
+                                            <SelectValue placeholder={loadingData ? "Yükleniyor..." : "Bölüm"} />
                                         </SelectTrigger>
                                         <SelectContent>
                                             {departments.map(d => (
@@ -159,9 +219,9 @@ export default function ContentsPage() {
                                         </SelectContent>
                                     </Select>
 
-                                    <Select value={selectedCourseId} onValueChange={setCourse} disabled={!selectedDepartmentId}>
+                                    <Select value={selectedCourseId} onValueChange={setCourse} disabled={!selectedDepartmentId || loadingData}>
                                         <SelectTrigger className="bg-background">
-                                            <SelectValue placeholder="Ders" />
+                                            <SelectValue placeholder={loadingData ? "Yükleniyor..." : "Ders"} />
                                         </SelectTrigger>
                                         <SelectContent>
                                             {courses.map(c => (
@@ -200,7 +260,7 @@ export default function ContentsPage() {
                         </Card>
 
                         {/* Results Grid */}
-                        {loading ? (
+                        {filesLoading ? (
                             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                                 {[...Array(6)].map((_, i) => (
                                     <Card key={i} className="flex flex-col p-6 h-[200px]">

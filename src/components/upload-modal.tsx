@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -9,9 +9,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useModalStore, useFileStore } from "@/store";
+import { useModalStore } from "@/store";
 import { useToast } from "@/components/ui/use-toast";
-import { universities } from "@/data/universities";
+import { useSession } from "next-auth/react";
 
 const uploadSchema = z.object({
     universityId: z.string().min(1, "Üniversite seçmelisiniz"),
@@ -21,11 +21,34 @@ const uploadSchema = z.object({
     examType: z.string().min(1, "Sınav türü seçmelisiniz"),
 });
 
+interface University {
+    id: string;
+    name: string;
+    city: string;
+}
+
+interface Department {
+    id: string;
+    name: string;
+}
+
+interface Course {
+    id: string;
+    name: string;
+}
+
 export function UploadModal() {
     const { uploadModalOpen, closeUploadModal } = useModalStore();
     const { toast } = useToast();
+    const { data: session } = useSession();
     const [loading, setLoading] = useState(false);
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
+
+    // Data from API
+    const [universities, setUniversities] = useState<University[]>([]);
+    const [departments, setDepartments] = useState<Department[]>([]);
+    const [courses, setCourses] = useState<Course[]>([]);
+    const [loadingData, setLoadingData] = useState(false);
 
     const { control, handleSubmit, watch, setValue, formState: { errors }, reset } = useForm<z.infer<typeof uploadSchema>>({
         resolver: zodResolver(uploadSchema),
@@ -34,51 +57,112 @@ export function UploadModal() {
     const selectedUniId = watch("universityId");
     const selectedDepId = watch("departmentId");
 
-    const selectedUni = universities.find(u => u.id === selectedUniId);
-    const departments = selectedUni?.departments || [];
+    // Fetch universities on mount
+    useEffect(() => {
+        const fetchUniversities = async () => {
+            try {
+                const res = await fetch("/api/universities");
+                const data = await res.json();
+                setUniversities(data);
+            } catch (error) {
+                console.error("Failed to fetch universities:", error);
+            }
+        };
+        fetchUniversities();
+    }, []);
 
-    const selectedDep = departments.find(d => d.id === selectedDepId);
-    const courses = selectedDep?.courses || [];
+    // Fetch departments when university changes
+    useEffect(() => {
+        if (selectedUniId) {
+            setLoadingData(true);
+            setDepartments([]);
+            setCourses([]);
+            setValue("departmentId", "");
+            setValue("courseId", "");
 
-    const { addFile } = useFileStore();
+            fetch(`/api/universities?universityId=${selectedUniId}`)
+                .then(res => res.json())
+                .then(data => {
+                    setDepartments(data);
+                    setLoadingData(false);
+                })
+                .catch(() => setLoadingData(false));
+        }
+    }, [selectedUniId, setValue]);
+
+    // Fetch courses when department changes
+    useEffect(() => {
+        if (selectedDepId) {
+            setLoadingData(true);
+            setCourses([]);
+            setValue("courseId", "");
+
+            fetch(`/api/universities?departmentId=${selectedDepId}`)
+                .then(res => res.json())
+                .then(data => {
+                    setCourses(data);
+                    setLoadingData(false);
+                })
+                .catch(() => setLoadingData(false));
+        }
+    }, [selectedDepId, setValue]);
 
     const onSubmit = async (data: z.infer<typeof uploadSchema>) => {
-        setLoading(true);
-        // Mock upload delay
-        await new Promise((resolve) => setTimeout(resolve, 1500));
-
-        // Create blob URL for preview
-        let previewUrl = undefined;
-        if (selectedFile) {
-            previewUrl = URL.createObjectURL(selectedFile);
+        if (!session?.user) {
+            toast({
+                title: "Giriş yapmalısınız",
+                description: "Dosya yüklemek için giriş yapmanız gerekiyor.",
+                variant: "destructive",
+            });
+            return;
         }
 
-        const newFile: any = {
-            id: `file-${Date.now()}`,
-            universityId: data.universityId,
-            universityName: selectedUni?.name || "",
-            departmentId: data.departmentId,
-            departmentName: selectedDep?.name || "",
-            courseId: data.courseId,
-            courseName: courses.find(c => c.id === data.courseId)?.name || "",
-            year: parseInt(data.year),
-            examType: data.examType as any,
-            fileSize: selectedFile ? selectedFile.size : Math.floor(Math.random() * 5000000) + 100000,
-            uploadedAt: new Date().toISOString(),
-            viewCount: 0,
-            previewUrl: previewUrl
-        };
+        if (!selectedFile) {
+            toast({
+                title: "Dosya seçmelisiniz",
+                description: "Lütfen bir PDF dosyası seçin.",
+                variant: "destructive",
+            });
+            return;
+        }
 
-        addFile(newFile);
+        setLoading(true);
 
-        setLoading(false);
-        closeUploadModal();
-        reset();
-        setSelectedFile(null); // Reset file selection
-        toast({
-            title: "Dosya yüklendi",
-            description: "Dosyanız başarıyla sisteme eklendi.",
-        });
+        try {
+            // Create FormData for file upload
+            const formData = new FormData();
+            formData.append("pdf", selectedFile);
+            formData.append("universityId", data.universityId);
+            formData.append("departmentId", data.departmentId);
+            formData.append("courseId", data.courseId);
+            formData.append("year", data.year);
+            formData.append("examType", data.examType);
+
+            const response = await fetch("/api/files", {
+                method: "POST",
+                body: formData,
+            });
+
+            if (!response.ok) {
+                throw new Error("Upload failed");
+            }
+
+            setLoading(false);
+            closeUploadModal();
+            reset();
+            setSelectedFile(null);
+            toast({
+                title: "Dosya yüklendi",
+                description: "Dosyanız başarıyla sisteme eklendi.",
+            });
+        } catch (error) {
+            setLoading(false);
+            toast({
+                title: "Hata",
+                description: "Dosya yüklenirken bir hata oluştu.",
+                variant: "destructive",
+            });
+        }
     };
 
     return (
@@ -100,11 +184,7 @@ export function UploadModal() {
                                 name="universityId"
                                 render={({ field }) => (
                                     <Select
-                                        onValueChange={(val) => {
-                                            field.onChange(val);
-                                            setValue("departmentId", "");
-                                            setValue("courseId", "");
-                                        }}
+                                        onValueChange={field.onChange}
                                         value={field.value}
                                     >
                                         <SelectTrigger>
@@ -128,15 +208,12 @@ export function UploadModal() {
                                 name="departmentId"
                                 render={({ field }) => (
                                     <Select
-                                        onValueChange={(val) => {
-                                            field.onChange(val);
-                                            setValue("courseId", "");
-                                        }}
+                                        onValueChange={field.onChange}
                                         value={field.value}
-                                        disabled={!selectedUniId}
+                                        disabled={!selectedUniId || loadingData}
                                     >
                                         <SelectTrigger>
-                                            <SelectValue placeholder="Bölüm seçin" />
+                                            <SelectValue placeholder={loadingData ? "Yükleniyor..." : "Bölüm seçin"} />
                                         </SelectTrigger>
                                         <SelectContent>
                                             {departments.map((d) => (
@@ -155,9 +232,9 @@ export function UploadModal() {
                                 control={control}
                                 name="courseId"
                                 render={({ field }) => (
-                                    <Select onValueChange={field.onChange} value={field.value} disabled={!selectedDepId}>
+                                    <Select onValueChange={field.onChange} value={field.value} disabled={!selectedDepId || loadingData}>
                                         <SelectTrigger>
-                                            <SelectValue placeholder="Ders seçin" />
+                                            <SelectValue placeholder={loadingData ? "Yükleniyor..." : "Ders seçin"} />
                                         </SelectTrigger>
                                         <SelectContent>
                                             {courses.map((c) => (
