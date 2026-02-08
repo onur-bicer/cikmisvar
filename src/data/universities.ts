@@ -1679,6 +1679,25 @@ export const universities: University[] = [
                 "courses": []
             }
         ]
+    },
+    {
+        "id": "c0926861-196d-498c-905b-801262d1c676",
+        "name": "KARADENİZ TEKNİK ÜNİVERSİTESİ",
+        "city": "Trabzon",
+        "departments": [
+            {
+                "id": "e45f9a7d-2b81-432d-8902-17865c3b90a1",
+                "universityId": "c0926861-196d-498c-905b-801262d1c676",
+                "name": "ELEKTRONİK VE HABERLEŞME MÜHENDİSLİĞİ",
+                "courses": [
+                    {
+                        "id": "b781e643-fc01-443b-8173-098528990b72",
+                        "name": "SİNYAL VE SİSTEMLER",
+                        "departmentId": "e45f9a7d-2b81-432d-8902-17865c3b90a1"
+                    }
+                ]
+            }
+        ]
     }
 ];
 
