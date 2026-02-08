@@ -12,13 +12,15 @@ async function main() {
     where: { email },
     update: {
       role: 'admin',
-      password: hashedPassword, // Ensure password is correct if user exists
+      password: hashedPassword,
+      emailVerified: new Date(),
     },
     create: {
       email,
       name: 'System Admin',
       password: hashedPassword,
       role: 'admin',
+      emailVerified: new Date(),
     },
   })
 
