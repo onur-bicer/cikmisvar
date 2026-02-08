@@ -4,6 +4,7 @@ export const metadata = {
 };
 
 import { ThemeProvider } from "@/components/theme-provider";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 
 export default function RootLayout({
@@ -24,6 +25,7 @@ export default function RootLayout({
                     <div className="theme-gradient" />
                     {children}
                 </ThemeProvider>
+                <Analytics />
             </body>
         </html>
     );
