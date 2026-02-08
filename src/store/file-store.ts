@@ -4,7 +4,9 @@ import { mockFiles } from "@/data/mock-files";
 
 interface FileState {
     files: ExamFile[];
+    setFiles: (files: ExamFile[]) => void;
     addComment: (fileId: string, comment: any) => void;
+    addFile: (file: any) => void;
 }
 
 export const useFileStore = create<FileState>((set) => ({
