@@ -273,6 +273,27 @@ export default function Home() {
                                         </button>
                                     ))}
                                 </div>
+
+                                {recommendedFiles.length > 0 && (
+                                    <div className="mt-12 pt-8 border-t border-border/50 animate-fade-in">
+                                        <div className="mb-4 text-center">
+                                            <span className="text-sm font-medium text-muted-foreground">Sizin İçin Önerilenler</span>
+                                        </div>
+                                        <div className="flex flex-wrap justify-center gap-2">
+                                            {recommendedFiles.slice(0, 5).map((file) => (
+                                                <Badge
+                                                    key={file.id}
+                                                    variant="outline"
+                                                    className="cursor-pointer px-4 py-2 text-sm transition-all hover:scale-105 hover:bg-primary/5 hover:border-primary/20"
+                                                    onClick={() => openPreviewModal(file.id)}
+                                                >
+                                                    <FileText className="mr-2 h-3.5 w-3.5 text-primary" />
+                                                    {file.courseName}
+                                                </Badge>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </div>
