@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useMemo, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { Search, ArrowRight, Upload, X, FileText, BookOpen } from "lucide-react";
+import { Search, ArrowRight, Upload, X, FileText, BookOpen, Eye, Filter } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
@@ -119,8 +119,6 @@ export default function Home() {
         }
     };
 
-    if (!mounted) return null;
-
     // Recommended files state
     const [recommendedFiles, setRecommendedFiles] = useState<any[]>([]);
 
@@ -136,6 +134,8 @@ export default function Home() {
                 .catch(err => console.error("Failed to fetch recommendations:", err));
         }
     }, [session]);
+
+    if (!mounted) return null;
 
     return (
         <div className="flex min-h-screen flex-col">
