@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
+import { generateVerificationToken } from "@/lib/tokens";
+import { sendVerificationEmail } from "@/lib/mail";
 
 const registerSchema = z.object({
     name: z.string().min(2),
@@ -33,13 +35,15 @@ export async function POST(req: Request) {
                 email,
                 password: hashedPassword,
                 role: "user",
+                // emailVerified is null by default
             },
         });
 
-        // Exclude password from response
-        const { password: _, ...userWithoutPassword } = user;
+        // Generate verification token and send email
+        const verificationToken = await generateVerificationToken(email);
+        await sendVerificationEmail(email, verificationToken.token);
 
-        return NextResponse.json(userWithoutPassword, { status: 201 });
+        return NextResponse.json({ success: "Confirmation email sent!" }, { status: 201 });
     } catch (error) {
         if (error instanceof z.ZodError) {
             return NextResponse.json({ message: "Invalid data", errors: error.errors }, { status: 400 });

@@ -37,6 +37,10 @@ const providers: NextAuthOptions["providers"] = [
         throw new Error("Invalid credentials");
       }
 
+      if (!user.emailVerified) {
+        throw new Error("Email doğrulamanız gerekmektedir.");
+      }
+
       return {
         id: user.id,
         name: user.name,
