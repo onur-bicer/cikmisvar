@@ -1,0 +1,83 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String    @id @default(cuid())
+  name      String?
+  email     String    @unique
+  password  String
+  role      String    @default("user") // "user" or "admin"
+  avatar    String?
+  createdAt DateTime  @default(now())
+  favorites Favorite[]
+  uploads   File[]
+}
+
+model University {
+  id          String       @id @default(cuid())
+  name        String
+  city        String?
+  departments Department[]
+  files       File[]
+}
+
+model Department {
+  id           String     @id @default(cuid())
+  name         String
+  universityId String
+  university   University @relation(fields: [universityId], references: [id])
+  courses      Course[]
+  files        File[]
+}
+
+model Course {
+  id           String     @id @default(cuid())
+  name         String
+  departmentId String
+  department   Department @relation(fields: [departmentId], references: [id])
+  files        File[]
+}
+
+model File {
+  id             String     @id @default(cuid())
+  universityId   String
+  university     University @relation(fields: [universityId], references: [id])
+  departmentId   String
+  department     Department @relation(fields: [departmentId], references: [id])
+  courseId       String
+  course         Course     @relation(fields: [courseId], references: [id])
+  year           Int
+  examType       String     // MIDTERM, FINAL, QUIZ, MAKEUP
+  filePath       String
+  fileSize       Int
+  views          Int        @default(0)
+  uploaderId     String
+  uploader       User       @relation(fields: [uploaderId], references: [id])
+  status         String     @default("pending") // pending, approved
+  createdAt      DateTime   @default(now())
+  favorites      Favorite[]
+  reports        Report[]
+}
+
+model Favorite {
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+  fileId String
+  file   File   @relation(fields: [fileId], references: [id])
+
+  @@id([userId, fileId])
+}
+
+model Report {
+  id        String   @id @default(cuid())
+  fileId    String
+  file      File     @relation(fields: [fileId], references: [id])
+  reason    String
+  createdAt DateTime @default(now())
+}
