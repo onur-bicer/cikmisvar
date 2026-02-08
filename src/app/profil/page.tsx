@@ -39,6 +39,7 @@ export default function ProfilePage() {
     if (!session?.user) return null;
 
     const user = session.user;
+    const userDisplayName = user.name ?? "Kullanıcı";
 
     return (
         <div className="flex min-h-screen flex-col">
@@ -49,14 +50,14 @@ export default function ProfilePage() {
                     {/* Header Section */}
                     <div className="flex flex-col md:flex-row items-center gap-6 p-6 rounded-xl bg-card border shadow-sm">
                         <Avatar className="h-24 w-24 ring-4 ring-background shadow-lg">
-                            <AvatarImage src={user.avatar} alt={user.name} />
+                            <AvatarImage src={user.image || undefined} alt={userDisplayName} />
                             <AvatarFallback className="text-2xl bg-primary/10 text-primary">
-                                {user.name.charAt(0).toUpperCase()}
+                                {userDisplayName.charAt(0).toUpperCase()}
                             </AvatarFallback>
                         </Avatar>
 
                         <div className="text-center md:text-left flex-1 space-y-2">
-                            <h1 className="text-2xl font-bold tracking-tight">{user.name}</h1>
+                            <h1 className="text-2xl font-bold tracking-tight">{userDisplayName}</h1>
                             <p className="text-muted-foreground">{user.email}</p>
                             <div className="flex items-center justify-center md:justify-start gap-2 pt-2">
                                 <span className="inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20 dark:bg-green-900/30 dark:text-green-400">
