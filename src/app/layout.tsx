@@ -5,6 +5,7 @@ export const metadata = {
 
 import { ThemeProvider } from "@/components/theme-provider";
 import { AuthProvider } from "@/components/auth-provider";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 
 export default function RootLayout({
@@ -25,6 +26,7 @@ export default function RootLayout({
                     >
                         <div className="theme-gradient" />
                         {children}
+                        <Analytics />
                     </ThemeProvider>
                 </AuthProvider>
             </body>
