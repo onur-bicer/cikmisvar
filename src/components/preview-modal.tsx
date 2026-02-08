@@ -25,9 +25,11 @@ export function PreviewModal() {
                             {file.universityName} • {file.year} {formatExamType(file.examType)} • {formatFileSize(file.fileSize)}
                         </p>
                     </div>
-                    <Button size="sm" className="ml-4 gap-2">
-                        <Download className="h-4 w-4" />
-                        <span className="hidden sm:inline">İndir</span>
+                    <Button size="sm" className="ml-4 gap-2" asChild>
+                        <a href={file.previewUrl} download target="_blank" rel="noopener noreferrer">
+                            <Download className="h-4 w-4" />
+                            <span className="hidden sm:inline">İndir</span>
+                        </a>
                     </Button>
                 </DialogHeader>
 
