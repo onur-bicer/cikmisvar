@@ -15,6 +15,7 @@ export const mockFiles: ExamFile[] = [
         fileSize: 245760,
         uploadedAt: "2024-12-15T10:30:00Z",
         viewCount: 342,
+        downloadCount: 45,
     },
     {
         id: "file-2",
@@ -30,6 +31,7 @@ export const mockFiles: ExamFile[] = [
         fileSize: 189440,
         uploadedAt: "2024-11-20T14:15:00Z",
         viewCount: 256,
+        downloadCount: 32,
     },
     {
         id: "file-3",
@@ -45,6 +47,7 @@ export const mockFiles: ExamFile[] = [
         fileSize: 312320,
         uploadedAt: "2024-12-18T09:45:00Z",
         viewCount: 428,
+        downloadCount: 89,
     },
     {
         id: "file-4",
@@ -60,6 +63,7 @@ export const mockFiles: ExamFile[] = [
         fileSize: 156672,
         uploadedAt: "2024-01-10T16:20:00Z",
         viewCount: 189,
+        downloadCount: 12,
     },
     {
         id: "file-5",
@@ -75,6 +79,7 @@ export const mockFiles: ExamFile[] = [
         fileSize: 278528,
         uploadedAt: "2024-10-25T11:00:00Z",
         viewCount: 312,
+        downloadCount: 67,
     },
     {
         id: "file-6",
@@ -90,6 +95,7 @@ export const mockFiles: ExamFile[] = [
         fileSize: 98304,
         uploadedAt: "2024-11-05T13:30:00Z",
         viewCount: 145,
+        downloadCount: 23,
     },
     {
         id: "file-7",
@@ -105,6 +111,7 @@ export const mockFiles: ExamFile[] = [
         fileSize: 421888,
         uploadedAt: "2024-01-22T08:15:00Z",
         viewCount: 567,
+        downloadCount: 156,
     },
     {
         id: "file-8",
@@ -120,6 +127,7 @@ export const mockFiles: ExamFile[] = [
         fileSize: 203776,
         uploadedAt: "2024-09-15T15:45:00Z",
         viewCount: 98,
+        downloadCount: 15,
     },
     {
         id: "file-9",
@@ -135,6 +143,7 @@ export const mockFiles: ExamFile[] = [
         fileSize: 167936,
         uploadedAt: "2024-12-20T10:00:00Z",
         viewCount: 234,
+        downloadCount: 44,
     },
     {
         id: "file-10",
@@ -150,6 +159,7 @@ export const mockFiles: ExamFile[] = [
         fileSize: 289792,
         uploadedAt: "2024-11-12T14:30:00Z",
         viewCount: 176,
+        downloadCount: 28,
     },
 ];
 
