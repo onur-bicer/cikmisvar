@@ -8,7 +8,7 @@ import { generateVerificationToken } from "@/lib/tokens";
 import { sendVerificationEmail } from "@/lib/mail";
 
 const registerSchema = z.object({
-    name: z.string().min(2),
+    username: z.string().min(3).regex(/^[a-zA-Z0-9_]+$/, "Kullanıcı adı sadece harf, rakam ve alt çizgi içerebilir"),
     email: z.string().email(),
     password: z.string().min(6),
 });
@@ -16,15 +16,28 @@ const registerSchema = z.object({
 export async function POST(req: Request) {
     try {
         const body = await req.json();
-        const { name, email, password } = registerSchema.parse(body);
+        const { username, email, password } = registerSchema.parse(body);
 
-        const existingUser = await prisma.user.findUnique({
+        // Check if email exists
+        const existingEmail = await prisma.user.findUnique({
             where: { email },
         });
 
-        if (existingUser) {
+        if (existingEmail) {
             return NextResponse.json(
-                { message: "User already exists" },
+                { message: "Bu e-posta adresi zaten kullanımda" },
+                { status: 400 }
+            );
+        }
+
+        // Check if username exists
+        const existingUsername = await prisma.user.findUnique({
+            where: { username },
+        });
+
+        if (existingUsername) {
+            return NextResponse.json(
+                { message: "Bu kullanıcı adı zaten alınmış" },
                 { status: 400 }
             );
         }
@@ -33,7 +46,7 @@ export async function POST(req: Request) {
 
         const user = await prisma.user.create({
             data: {
-                name,
+                username,
                 email,
                 password: hashedPassword,
                 role: "user",

@@ -19,9 +19,9 @@ const loginSchema = z.object({
 });
 
 const registerSchema = z.object({
-    name: z.string().min(2, "Ad Soyad en az 2 karakter olmalı"),
-    email: z.string().email("Geçerli bir email adresi girin"),
-    password: z.string().min(6, "Şifre en az 6 karakter olmalı"),
+    username: z.string().min(3, "Kullanıcı adı en az 3 karakter olmalıdır"),
+    email: z.string().email("Geçerli bir e-posta adresi giriniz"),
+    password: z.string().min(6, "Şifre en az 6 karakter olmalıdır"),
 });
 
 const GoogleIcon = () => (
@@ -62,10 +62,10 @@ export function AuthModal() {
     const registerForm = useForm<z.infer<typeof registerSchema>>({
         resolver: zodResolver(registerSchema),
         defaultValues: {
-            name: "",
+            username: "",
             email: "",
             password: "",
-        }
+        },
     });
 
     const onLogin = async (data: z.infer<typeof loginSchema>) => {
@@ -109,7 +109,7 @@ export function AuthModal() {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
-                    name: data.name,
+                    username: data.username,
                     email: data.email,
                     password: data.password,
                 }),
@@ -218,10 +218,10 @@ export function AuthModal() {
                     <TabsContent value="register" className="space-y-4 pt-4">
                         <form onSubmit={registerForm.handleSubmit(onRegister)} className="space-y-4">
                             <div className="space-y-2">
-                                <Label htmlFor="register-name">Ad Soyad</Label>
-                                <Input id="register-name" {...registerForm.register("name")} placeholder="Adınız Soyadınız" />
-                                {registerForm.formState.errors.name && (
-                                    <p className="text-xs text-destructive">{registerForm.formState.errors.name.message}</p>
+                                <Label htmlFor="register-username">Kullanıcı Adı</Label>
+                                <Input id="register-username" {...registerForm.register("username")} placeholder="kullaniciadi" />
+                                {registerForm.formState.errors.username && (
+                                    <p className="text-xs text-destructive">{registerForm.formState.errors.username.message}</p>
                                 )}
                             </div>
                             <div className="space-y-2">
