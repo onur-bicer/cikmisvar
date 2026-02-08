@@ -85,7 +85,7 @@ export function Navbar() {
                                     <DropdownMenuTrigger asChild>
                                         <Button variant="ghost" className="relative h-9 w-9 rounded-full">
                                             <Avatar className="h-9 w-9 ring-2 ring-primary/10 transition-shadow hover:ring-primary/20">
-                                                <AvatarImage src={user.image || undefined} alt={user.name || "User"} />
+                                                <AvatarImage src={(user as any).avatar || user.image || undefined} alt={user.name || "User"} />
                                                 <AvatarFallback className="text-primary font-medium bg-primary/5">
                                                     {user.name?.charAt(0).toUpperCase() || "U"}
                                                 </AvatarFallback>
@@ -102,19 +102,25 @@ export function Navbar() {
                                             </div>
                                         </DropdownMenuLabel>
                                         <DropdownMenuSeparator />
-                                        <DropdownMenuItem onClick={() => router.push("/profil")}>
-                                            <User className="mr-2 h-4 w-4" />
-                                            <span>Profil</span>
+                                        <DropdownMenuItem asChild>
+                                            <Link href="/profil" className="flex w-full items-center">
+                                                <User className="mr-2 h-4 w-4" />
+                                                <span>Profil</span>
+                                            </Link>
                                         </DropdownMenuItem>
                                         {(user as any).role === "admin" && (
-                                            <DropdownMenuItem onClick={() => router.push("/admin")}>
-                                                <Settings className="mr-2 h-4 w-4" />
-                                                <span>Yönetim Paneli</span>
+                                            <DropdownMenuItem asChild>
+                                                <Link href="/admin" className="flex w-full items-center">
+                                                    <Settings className="mr-2 h-4 w-4" />
+                                                    <span>Yönetim Paneli</span>
+                                                </Link>
                                             </DropdownMenuItem>
                                         )}
-                                        <DropdownMenuItem onClick={() => router.push("/ayarlar")}>
-                                            <Settings className="mr-2 h-4 w-4" />
-                                            <span>Ayarlar</span>
+                                        <DropdownMenuItem asChild>
+                                            <Link href="/ayarlar" className="flex w-full items-center">
+                                                <Settings className="mr-2 h-4 w-4" />
+                                                <span>Ayarlar</span>
+                                            </Link>
                                         </DropdownMenuItem>
                                         <DropdownMenuSeparator />
                                         <DropdownMenuItem

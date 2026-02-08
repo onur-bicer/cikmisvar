@@ -58,10 +58,9 @@ export function AuthModal() {
                     title: "Giriş başarılı",
                     description: "Hoş geldiniz!",
                 });
-                // Refresh the page to update session state everywhere
                 window.location.reload();
             }
-        } catch (error) {
+        } catch {
             toast({
                 title: "Hata",
                 description: "Giriş yapılırken bir hata oluştu.",
@@ -75,7 +74,6 @@ export function AuthModal() {
     const onRegister = async (data: z.infer<typeof registerSchema>) => {
         setLoading(true);
         try {
-            // First register the user
             const res = await fetch("/api/auth/register", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -97,7 +95,6 @@ export function AuthModal() {
                 return;
             }
 
-            // Then sign in
             const result = await signIn("credentials", {
                 email: data.email,
                 password: data.password,
@@ -117,12 +114,21 @@ export function AuthModal() {
                 });
                 window.location.reload();
             }
-        } catch (error) {
+        } catch {
             toast({
                 title: "Hata",
                 description: "Kayıt olurken bir hata oluştu.",
                 variant: "destructive",
             });
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const onGoogleAuth = async () => {
+        setLoading(true);
+        try {
+            await signIn("google", { callbackUrl: "/" });
         } finally {
             setLoading(false);
         }
@@ -172,8 +178,8 @@ export function AuthModal() {
                                 <span className="bg-background px-2 text-muted-foreground">Veya</span>
                             </div>
                         </div>
-                        <Button variant="outline" className="w-full" type="button" disabled>
-                            Google ile Giriş Yap (Yakında)
+                        <Button variant="outline" className="w-full" type="button" onClick={onGoogleAuth} disabled={loading}>
+                            Google ile Giriş Yap
                         </Button>
                     </TabsContent>
 
@@ -204,6 +210,17 @@ export function AuthModal() {
                                 {loading ? "Kayıt olunuyor..." : "Kayıt Ol"}
                             </Button>
                         </form>
+                        <div className="relative my-4">
+                            <div className="absolute inset-0 flex items-center">
+                                <span className="w-full border-t" />
+                            </div>
+                            <div className="relative flex justify-center text-xs uppercase">
+                                <span className="bg-background px-2 text-muted-foreground">Veya</span>
+                            </div>
+                        </div>
+                        <Button variant="outline" className="w-full" type="button" onClick={onGoogleAuth} disabled={loading}>
+                            Google ile Kaydol
+                        </Button>
                     </TabsContent>
                 </Tabs>
             </DialogContent>

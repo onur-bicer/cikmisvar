@@ -3,6 +3,7 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
+import { randomBytes } from "crypto";
 
 // Build providers array conditionally
 const providers: NextAuthOptions["providers"] = [
@@ -41,6 +42,7 @@ const providers: NextAuthOptions["providers"] = [
         name: user.name,
         email: user.email,
         role: user.role as "user" | "admin",
+        avatar: user.avatar,
       };
     },
   }),
@@ -59,10 +61,37 @@ if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
 export const authOptions: NextAuthOptions = {
   providers,
   callbacks: {
+    async signIn({ user, account }) {
+      if (account?.provider !== "google" || !user.email) {
+        return true;
+      }
+
+      const placeholderPassword = await bcrypt.hash(randomBytes(32).toString("hex"), 10);
+
+      const dbUser = await prisma.user.upsert({
+        where: { email: user.email },
+        update: {
+          name: user.name ?? undefined,
+          avatar: user.image ?? undefined,
+        },
+        create: {
+          email: user.email,
+          name: user.name ?? "",
+          password: placeholderPassword,
+          role: "user",
+          avatar: user.image ?? null,
+        },
+      });
+
+      (user as any).id = dbUser.id;
+      (user as any).role = dbUser.role;
+      return true;
+    },
     async session({ session, token }) {
       if (token && session.user) {
         (session.user as any).id = token.id as string;
         (session.user as any).role = token.role as "user" | "admin";
+        (session.user as any).avatar = token.avatar as string | null;
       }
       return session;
     },
@@ -70,6 +99,7 @@ export const authOptions: NextAuthOptions = {
       if (user) {
         token.id = user.id;
         token.role = (user as any).role;
+        token.avatar = (user as any).avatar;
       }
       return token;
     },

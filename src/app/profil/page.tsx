@@ -49,14 +49,14 @@ export default function ProfilePage() {
                     {/* Header Section */}
                     <div className="flex flex-col md:flex-row items-center gap-6 p-6 rounded-xl bg-card border shadow-sm">
                         <Avatar className="h-24 w-24 ring-4 ring-background shadow-lg">
-                            <AvatarImage src={user.avatar} alt={user.name} />
+                            <AvatarImage src={user.avatar || user.image || undefined} alt={user.name || "Kullanıcı"} />
                             <AvatarFallback className="text-2xl bg-primary/10 text-primary">
-                                {user.name.charAt(0).toUpperCase()}
+                                {user.name?.charAt(0).toUpperCase() || "U"}
                             </AvatarFallback>
                         </Avatar>
 
                         <div className="text-center md:text-left flex-1 space-y-2">
-                            <h1 className="text-2xl font-bold tracking-tight">{user.name}</h1>
+                            <h1 className="text-2xl font-bold tracking-tight">{user.name || "Kullanıcı"}</h1>
                             <p className="text-muted-foreground">{user.email}</p>
                             <div className="flex items-center justify-center md:justify-start gap-2 pt-2">
                                 <span className="inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20 dark:bg-green-900/30 dark:text-green-400">
