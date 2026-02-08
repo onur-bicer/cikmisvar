@@ -55,7 +55,7 @@ export function PreviewModal() {
 
                     {/* Comments Area */}
                     <div className="w-full lg:w-[320px] xl:w-[380px] h-[50vh] lg:h-full flex-shrink-0 bg-background">
-                        <CommentSection fileId={file.id} comments={file.comments} />
+                        <CommentSection fileId={file.id} />
                     </div>
                 </div>
             </DialogContent>
