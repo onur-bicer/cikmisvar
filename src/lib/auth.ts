@@ -44,7 +44,7 @@ export const authOptions: NextAuthOptions = {
           id: user.id,
           name: user.name,
           email: user.email,
-          role: user.role,
+          role: user.role as "USER" | "ADMIN",
         };
       },
     }),
@@ -53,7 +53,7 @@ export const authOptions: NextAuthOptions = {
     async session({ session, token }) {
       if (token && session.user) {
         session.user.id = token.id as string;
-        session.user.role = token.role as string;
+        session.user.role = token.role as "USER" | "ADMIN";
       }
       return session;
     },
