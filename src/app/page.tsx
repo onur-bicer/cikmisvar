@@ -440,19 +440,7 @@ export default function Home() {
                                 </Button>
                             </div>
 
-                            <div className="flex flex-wrap gap-2 justify-center animate-fade-in" style={{ animationDelay: "100ms" }}>
-                                {popularSearches.map((search) => (
-                                    <Badge
-                                        key={search.id}
-                                        variant={activeChip === search.id ? "default" : "secondary"}
-                                        className={`cursor-pointer px-4 py-2 text-sm transition-all hover:scale-105 ${activeChip === search.id ? "bg-primary text-primary-foreground shadow-md" : "hover:bg-secondary/80"
-                                            }`}
-                                        onClick={() => handleChipClick(search)}
-                                    >
-                                        {search.label}
-                                    </Badge>
-                                ))}
-                            </div>
+
                         </div>
 
                         {/* Decorative circles */}
