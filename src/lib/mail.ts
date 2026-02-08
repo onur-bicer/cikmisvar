@@ -1,6 +1,8 @@
 import { Resend } from "resend";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const resend = process.env.RESEND_API_KEY
+    ? new Resend(process.env.RESEND_API_KEY)
+    : { emails: { send: async () => console.warn("Resend API key missing") } } as any;
 
 export const sendVerificationEmail = async (email: string, token: string) => {
     const confirmLink = `${process.env.NEXTAUTH_URL}/auth/new-verification?token=${token}`;
