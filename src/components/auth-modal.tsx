@@ -102,8 +102,6 @@ export function AuthModal() {
         }
     };
 
-    const [verificationSent, setVerificationSent] = useState(false);
-
     const onRegister = async (data: z.infer<typeof registerSchema>) => {
         setLoading(true);
         try {
@@ -128,11 +126,25 @@ export function AuthModal() {
                 return;
             }
 
-            setVerificationSent(true);
-            toast({
-                title: "Kayıt başarılı",
-                description: "Doğrulama e-postası gönderildi. Lütfen gelen kutunuzu kontrol edin.",
+            const result = await signIn("credentials", {
+                email: data.email,
+                password: data.password,
+                redirect: false,
             });
+
+            if (result?.error) {
+                toast({
+                    title: "Kayıt başarılı",
+                    description: "Hesabınız oluşturuldu. Lütfen giriş yapın.",
+                });
+            } else {
+                closeAuthModal();
+                toast({
+                    title: "Kayıt başarılı",
+                    description: "Hesabınız oluşturuldu ve giriş yapıldı.",
+                });
+                window.location.reload();
+            }
         } catch {
             toast({
                 title: "Hata",
@@ -204,49 +216,32 @@ export function AuthModal() {
                     </TabsContent>
 
                     <TabsContent value="register" className="space-y-4 pt-4">
-                        {verificationSent ? (
-                            <div className="flex flex-col items-center justify-center space-y-4 py-8 text-center text-sm text-muted-foreground animate-in fade-in slide-in-from-bottom-2">
-                                <div className="h-12 w-12 rounded-full bg-blue-50 flex items-center justify-center">
-                                    <svg className="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                                    </svg>
-                                </div>
-                                <div className="space-y-2">
-                                    <p className="font-semibold text-gray-900">Doğrulama E-postası Gönderildi!</p>
-                                    <p>Lütfen email adresinize gönderdiğimiz bağlantıya tıklayarak hesabınızı aktifleştirin.</p>
-                                </div>
-                                <Button variant="outline" onClick={() => setVerificationSent(false)} className="mt-2">
-                                    Geri Dön
-                                </Button>
+                        <form onSubmit={registerForm.handleSubmit(onRegister)} className="space-y-4">
+                            <div className="space-y-2">
+                                <Label htmlFor="register-name">Ad Soyad</Label>
+                                <Input id="register-name" {...registerForm.register("name")} placeholder="Adınız Soyadınız" />
+                                {registerForm.formState.errors.name && (
+                                    <p className="text-xs text-destructive">{registerForm.formState.errors.name.message}</p>
+                                )}
                             </div>
-                        ) : (
-                            <form onSubmit={registerForm.handleSubmit(onRegister)} className="space-y-4">
-                                <div className="space-y-2">
-                                    <Label htmlFor="register-name">Ad Soyad</Label>
-                                    <Input id="register-name" {...registerForm.register("name")} placeholder="Adınız Soyadınız" />
-                                    {registerForm.formState.errors.name && (
-                                        <p className="text-xs text-destructive">{registerForm.formState.errors.name.message}</p>
-                                    )}
-                                </div>
-                                <div className="space-y-2">
-                                    <Label htmlFor="register-email">Email</Label>
-                                    <Input id="register-email" type="email" {...registerForm.register("email")} placeholder="ornek@email.com" />
-                                    {registerForm.formState.errors.email && (
-                                        <p className="text-xs text-destructive">{registerForm.formState.errors.email.message}</p>
-                                    )}
-                                </div>
-                                <div className="space-y-2">
-                                    <Label htmlFor="register-password">Şifre</Label>
-                                    <Input id="register-password" type="password" {...registerForm.register("password")} />
-                                    {registerForm.formState.errors.password && (
-                                        <p className="text-xs text-destructive">{registerForm.formState.errors.password.message}</p>
-                                    )}
-                                </div>
-                                <Button type="submit" className="w-full" disabled={loading}>
-                                    {loading ? "Kayıt olunuyor..." : "Kayıt Ol"}
-                                </Button>
-                            </form>
-                        )}
+                            <div className="space-y-2">
+                                <Label htmlFor="register-email">Email</Label>
+                                <Input id="register-email" type="email" {...registerForm.register("email")} placeholder="ornek@email.com" />
+                                {registerForm.formState.errors.email && (
+                                    <p className="text-xs text-destructive">{registerForm.formState.errors.email.message}</p>
+                                )}
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="register-password">Şifre</Label>
+                                <Input id="register-password" type="password" {...registerForm.register("password")} />
+                                {registerForm.formState.errors.password && (
+                                    <p className="text-xs text-destructive">{registerForm.formState.errors.password.message}</p>
+                                )}
+                            </div>
+                            <Button type="submit" className="w-full" disabled={loading}>
+                                {loading ? "Kayıt olunuyor..." : "Kayıt Ol"}
+                            </Button>
+                        </form>
                     </TabsContent>
                 </Tabs>
             </DialogContent>

@@ -9,7 +9,7 @@ export const sendVerificationEmail = async (email: string, token: string) => {
 
     try {
         const data = await resend.emails.send({
-            from: "Çıkmış Var <sq6ju@inbox.testmail.app>", // Updated to user's testmail address
+            from: "Çıkmış Var <onboarding@resend.dev>",
             to: email,
             subject: "Emailinizi Doğrulayın",
             html: `<p>Merhaba,</p><p>Çıkmış Var hesabınızı doğrulamak için lütfen aşağıdaki linke tıklayın:</p><p><a href="${confirmLink}">Emailimi Doğrula</a></p>`,

@@ -37,15 +37,15 @@ export async function POST(req: Request) {
                 email,
                 password: hashedPassword,
                 role: "user",
-                // emailVerified is null by default
+                emailVerified: new Date(), // Auto-verify on registration
             },
         });
 
         // Generate verification token and send email
-        const verificationToken = await generateVerificationToken(email);
-        await sendVerificationEmail(email, verificationToken.token);
+        // const verificationToken = await generateVerificationToken(email);
+        // await sendVerificationEmail(email, verificationToken.token);
 
-        return NextResponse.json({ success: "Confirmation email sent!" }, { status: 201 });
+        return NextResponse.json({ success: "Registration successful!", user }, { status: 201 });
     } catch (error) {
         if (error instanceof z.ZodError) {
             return NextResponse.json({ message: "Invalid data", errors: error.errors }, { status: 400 });
