@@ -5,7 +5,8 @@ import { usePathname, useRouter } from "next/navigation";
 import { Moon, Sun, User as UserIcon, LogOut, Upload, Settings, User } from "lucide-react";
 import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
-import { useAuthStore, useModalStore } from "@/store";
+import { useModalStore } from "@/store";
+import { useSession, signOut } from "next-auth/react";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -18,10 +19,18 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export function Navbar() {
     const { setTheme, theme } = useTheme();
-    const { user, logout } = useAuthStore();
+    const { data: session } = useSession();
     const { openAuthModal, openUploadModal } = useModalStore();
     const pathname = usePathname();
     const router = useRouter();
+
+    const user = session?.user;
+
+    const handleLogout = async () => {
+        await signOut({ redirect: false });
+        router.push("/");
+        router.refresh();
+    };
 
     return (
         <header className="sticky top-0 z-40 w-full border-b bg-background/80 backdrop-blur-md transition-all duration-200">
@@ -76,9 +85,9 @@ export function Navbar() {
                                     <DropdownMenuTrigger asChild>
                                         <Button variant="ghost" className="relative h-9 w-9 rounded-full">
                                             <Avatar className="h-9 w-9 ring-2 ring-primary/10 transition-shadow hover:ring-primary/20">
-                                                <AvatarImage src={user.avatar} alt={user.name} />
+                                                <AvatarImage src={user.image || undefined} alt={user.name || "User"} />
                                                 <AvatarFallback className="text-primary font-medium bg-primary/5">
-                                                    {user.name.charAt(0).toUpperCase()}
+                                                    {user.name?.charAt(0).toUpperCase() || "U"}
                                                 </AvatarFallback>
                                             </Avatar>
                                         </Button>
@@ -104,10 +113,7 @@ export function Navbar() {
                                         <DropdownMenuSeparator />
                                         <DropdownMenuItem
                                             className="text-destructive focus:text-destructive"
-                                            onClick={() => {
-                                                logout();
-                                                router.push("/");
-                                            }}
+                                            onClick={handleLogout}
                                         >
                                             <LogOut className="mr-2 h-4 w-4" />
                                             <span>Çıkış Yap</span>

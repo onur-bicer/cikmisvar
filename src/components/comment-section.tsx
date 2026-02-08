@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { useAuthStore } from "@/store";
+import { useSession } from "next-auth/react";
 import { Comment } from "@/types";
 import { Send, Loader2 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
@@ -16,7 +16,8 @@ interface CommentSectionProps {
 }
 
 export function CommentSection({ fileId }: CommentSectionProps) {
-    const { user } = useAuthStore();
+    const { data: session } = useSession();
+    const user = session?.user;
     const { toast } = useToast();
     const [text, setText] = useState("");
     const [comments, setComments] = useState<Comment[]>([]);

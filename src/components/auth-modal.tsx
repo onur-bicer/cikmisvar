@@ -9,8 +9,9 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useAuthStore, useModalStore } from "@/store";
+import { useModalStore } from "@/store";
 import { useToast } from "@/components/ui/use-toast";
+import { signIn } from "next-auth/react";
 
 const loginSchema = z.object({
     email: z.string().email("Geçerli bir email adresi girin"),
@@ -25,7 +26,6 @@ const registerSchema = z.object({
 
 export function AuthModal() {
     const { authModalOpen, closeAuthModal } = useModalStore();
-    const { loginMock } = useAuthStore();
     const { toast } = useToast();
     const [loading, setLoading] = useState(false);
 
@@ -39,27 +39,93 @@ export function AuthModal() {
 
     const onLogin = async (data: z.infer<typeof loginSchema>) => {
         setLoading(true);
-        // Mock login delay
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-        loginMock(data.email, "Demo User");
-        setLoading(false);
-        closeAuthModal();
-        toast({
-            title: "Giriş başarılı",
-            description: "Hoş geldiniz!",
-        });
+        try {
+            const result = await signIn("credentials", {
+                email: data.email,
+                password: data.password,
+                redirect: false,
+            });
+
+            if (result?.error) {
+                toast({
+                    title: "Giriş başarısız",
+                    description: "Email veya şifre hatalı.",
+                    variant: "destructive",
+                });
+            } else {
+                closeAuthModal();
+                toast({
+                    title: "Giriş başarılı",
+                    description: "Hoş geldiniz!",
+                });
+                // Refresh the page to update session state everywhere
+                window.location.reload();
+            }
+        } catch (error) {
+            toast({
+                title: "Hata",
+                description: "Giriş yapılırken bir hata oluştu.",
+                variant: "destructive",
+            });
+        } finally {
+            setLoading(false);
+        }
     };
 
     const onRegister = async (data: z.infer<typeof registerSchema>) => {
         setLoading(true);
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-        loginMock(data.email, data.name);
-        setLoading(false);
-        closeAuthModal();
-        toast({
-            title: "Kayıt başarılı",
-            description: "Hesabınız oluşturuldu ve giriş yapıldı.",
-        });
+        try {
+            // First register the user
+            const res = await fetch("/api/auth/register", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    name: data.name,
+                    email: data.email,
+                    password: data.password,
+                }),
+            });
+
+            if (!res.ok) {
+                const errorData = await res.json();
+                toast({
+                    title: "Kayıt başarısız",
+                    description: errorData.message || "Bu email zaten kullanılıyor olabilir.",
+                    variant: "destructive",
+                });
+                setLoading(false);
+                return;
+            }
+
+            // Then sign in
+            const result = await signIn("credentials", {
+                email: data.email,
+                password: data.password,
+                redirect: false,
+            });
+
+            if (result?.error) {
+                toast({
+                    title: "Kayıt başarılı",
+                    description: "Hesabınız oluşturuldu. Lütfen giriş yapın.",
+                });
+            } else {
+                closeAuthModal();
+                toast({
+                    title: "Kayıt başarılı",
+                    description: "Hesabınız oluşturuldu ve giriş yapıldı.",
+                });
+                window.location.reload();
+            }
+        } catch (error) {
+            toast({
+                title: "Hata",
+                description: "Kayıt olurken bir hata oluştu.",
+                variant: "destructive",
+            });
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -107,7 +173,7 @@ export function AuthModal() {
                             </div>
                         </div>
                         <Button variant="outline" className="w-full" type="button" disabled>
-                            Google ile Giriş Yap (Demo)
+                            Google ile Giriş Yap (Yakında)
                         </Button>
                     </TabsContent>
 
