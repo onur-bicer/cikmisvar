@@ -126,14 +126,14 @@ export default function Home() {
 
             <main className="flex-1 overflow-hidden">
                 {/* Hero Section */}
-                <section className="container mx-auto px-4 pt-12 pb-20 lg:pt-24 lg:pb-32">
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                <section className="container mx-auto px-4 pt-16 pb-24 lg:pt-32 lg:pb-40">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-center">
                         {/* Left Content */}
                         <motion.div
                             initial={{ x: -50, opacity: 0 }}
                             animate={{ x: 0, opacity: 1 }}
                             transition={{ duration: 0.6, ease: "easeOut" }}
-                            className="space-y-8"
+                            className="space-y-10 lg:space-y-12"
                         >
                             <div className="inline-flex items-center rounded-full bg-blue-50 px-3 py-1 text-sm font-medium text-blue-600">
                                 Neden Çıkmış Var?
@@ -232,7 +232,7 @@ export default function Home() {
                                 )}
                             </div>
 
-                            <div className="flex flex-col sm:flex-row gap-4 pt-4">
+                            <div className="flex flex-col sm:flex-row gap-6 pt-6">
                                 <Button size="lg" className="h-14 px-8 text-base rounded-xl bg-blue-600 hover:bg-blue-700 hover:scale-105 transition-all duration-300 shadow-lg shadow-blue-600/20" onClick={() => {
                                     ctaRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
                                 }}>
@@ -281,8 +281,8 @@ export default function Home() {
                 </section>
 
                 {/* Features Section */}
-                <section className="container mx-auto px-4 py-16">
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <section className="container mx-auto px-4 py-24">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-10 lg:gap-12">
                         {/* Feature 1 */}
                         <motion.div
                             initial={{ y: 40, opacity: 0 }}
@@ -340,8 +340,8 @@ export default function Home() {
                 </section>
 
                 {/* Popular Files Section (Adapting style to match new design) */}
-                <section className="container mx-auto px-4 py-20">
-                    <div className="flex justify-between items-center mb-10">
+                <section className="container mx-auto px-4 py-28">
+                    <div className="flex justify-between items-center mb-14">
                         <h2 className="text-2xl font-bold text-gray-900 tracking-tight">
                             Popüler Dosyalar
                         </h2>
@@ -350,7 +350,7 @@ export default function Home() {
                         </Button>
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-10">
                         {files.slice(0, 8).map((file, i) => (
                             <motion.div
                                 key={file.id}
@@ -387,9 +387,9 @@ export default function Home() {
                 </section>
 
                 {/* Stats Section */}
-                <section className="py-24 bg-gradient-to-r from-blue-50 via-indigo-50 to-blue-50">
+                <section className="py-32 bg-gradient-to-r from-blue-50 via-indigo-50 to-blue-50 text-center">
                     <div className="container mx-auto px-4">
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-12 text-center">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-16 lg:gap-24 text-center">
                             <motion.div
                                 initial={{ scale: 0.5, opacity: 0 }}
                                 whileInView={{ scale: 1, opacity: 1 }}
@@ -430,8 +430,8 @@ export default function Home() {
                 </section>
 
                 {/* CTA Section */}
-                <section ref={ctaRef} className="container mx-auto px-4 py-24">
-                    <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-blue-600 to-blue-800 px-6 py-20 text-center shadow-2xl">
+                <section ref={ctaRef} className="container mx-auto px-4 py-32 lg:py-40">
+                    <div className="relative overflow-hidden rounded-[2.5rem] bg-gradient-to-br from-blue-600 to-blue-800 px-8 py-24 lg:py-32 text-center shadow-2xl">
                         {/* Background Effects */}
                         <div className="absolute top-0 left-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2 animate-pulse" />
                         <div className="absolute bottom-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl translate-x-1/2 translate-y-1/2 animate-pulse delay-700" />
