@@ -75,7 +75,7 @@ model Favorite {
   userId String
   user   User   @relation(fields: [userId], references: [id])
   fileId String
-  file   File   @relation(fields: [fileId], references: [id])
+  file   File   @relation(fields: [fileId], references: [id], onDelete: Cascade)
 
   @@id([userId, fileId])
 }
@@ -83,7 +83,7 @@ model Favorite {
 model Report {
   id        String   @id @default(cuid())
   fileId    String
-  file      File     @relation(fields: [fileId], references: [id])
+  file      File     @relation(fields: [fileId], references: [id], onDelete: Cascade)
   reason    String
   createdAt DateTime @default(now())
 }
@@ -92,7 +92,7 @@ model Comment {
   id        String   @id @default(cuid())
   text      String
   fileId    String
-  file      File     @relation(fields: [fileId], references: [id])
+  file      File     @relation(fields: [fileId], references: [id], onDelete: Cascade)
   userId    String
   user      User     @relation(fields: [userId], references: [id])
   createdAt DateTime @default(now())
