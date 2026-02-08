@@ -25,6 +25,7 @@ export async function GET(req: Request) {
 
         const formattedComments = comments.map(comment => ({
             id: comment.id,
+            userId: comment.userId,
             text: comment.text,
             userName: comment.user.name || "Anonim",
             avatar: comment.user.avatar,

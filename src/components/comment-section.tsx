@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useSession } from "next-auth/react";
 import { Comment } from "@/types";
-import { Send, Loader2 } from "lucide-react";
+import { Send, Loader2, Trash2 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { tr } from "date-fns/locale";
 import { useToast } from "@/components/ui/use-toast";
@@ -17,12 +17,13 @@ interface CommentSectionProps {
 
 export function CommentSection({ fileId }: CommentSectionProps) {
     const { data: session } = useSession();
-    const user = session?.user;
+    const user = session?.user as any; // Cast to access role
     const { toast } = useToast();
     const [text, setText] = useState("");
     const [comments, setComments] = useState<Comment[]>([]);
     const [loading, setLoading] = useState(true);
     const [submitting, setSubmitting] = useState(false);
+    const [deletingId, setDeletingId] = useState<string | null>(null);
 
     // Fetch comments on mount
     useEffect(() => {
@@ -86,6 +87,35 @@ export function CommentSection({ fileId }: CommentSectionProps) {
         }
     };
 
+    const handleDelete = async (commentId: string) => {
+        if (!confirm("Bu yorumu silmek istediğinize emin misiniz?")) return;
+
+        setDeletingId(commentId);
+        try {
+            const res = await fetch(`/api/comments/${commentId}`, {
+                method: "DELETE",
+            });
+
+            if (res.ok) {
+                setComments(prev => prev.filter(c => c.id !== commentId));
+                toast({
+                    title: "Yorum silindi",
+                    description: "Yorum başarıyla silindi.",
+                });
+            } else {
+                throw new Error("Failed to delete");
+            }
+        } catch (error) {
+            toast({
+                title: "Hata",
+                description: "Yorum silinirken bir hata oluştu.",
+                variant: "destructive",
+            });
+        } finally {
+            setDeletingId(null);
+        }
+    };
+
     return (
         <div className="flex flex-col h-full bg-background border-l">
             <div className="p-4 border-b flex-shrink-0">
@@ -108,7 +138,7 @@ export function CommentSection({ fileId }: CommentSectionProps) {
                     </div>
                 ) : (
                     comments.map((comment) => (
-                        <div key={comment.id} className="flex gap-3 group">
+                        <div key={comment.id} className="flex gap-3 group relative">
                             <Avatar className="h-8 w-8">
                                 <AvatarImage src={comment.avatar} />
                                 <AvatarFallback>
@@ -122,8 +152,24 @@ export function CommentSection({ fileId }: CommentSectionProps) {
                                         {formatDistanceToNow(new Date(comment.createdAt), { addSuffix: true, locale: tr })}
                                     </span>
                                 </div>
-                                <p className="text-sm text-foreground/90 whitespace-pre-wrap">{comment.text}</p>
+                                <p className="text-sm text-foreground/90 whitespace-pre-wrap pr-6">{comment.text}</p>
                             </div>
+
+                            {(user?.role === "admin" || user?.id === comment.userId) && (
+                                <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="h-6 w-6 absolute top-0 right-0 opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-destructive"
+                                    onClick={() => handleDelete(comment.id)}
+                                    disabled={deletingId === comment.id}
+                                >
+                                    {deletingId === comment.id ? (
+                                        <Loader2 className="h-3 w-3 animate-spin" />
+                                    ) : (
+                                        <Trash2 className="h-3 w-3" />
+                                    )}
+                                </Button>
+                            )}
                         </div>
                     ))
                 )}

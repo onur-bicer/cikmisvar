@@ -50,6 +50,7 @@ export async function GET(req: Request) {
 
         const formattedFiles = files.map((file) => ({
             id: file.id,
+            uploaderId: file.uploaderId,
             universityId: file.universityId,
             universityName: file.university.name,
             departmentId: file.departmentId,

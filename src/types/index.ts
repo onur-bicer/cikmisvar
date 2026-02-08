@@ -21,6 +21,7 @@ export interface Course {
 
 export interface ExamFile {
     id: string;
+    uploaderId: string;
     universityId: string;
     universityName: string;
     departmentId: string;
@@ -38,6 +39,7 @@ export interface ExamFile {
 
 export interface Comment {
     id: string;
+    userId: string;
     userName: string;
     text: string;
     createdAt: string;

@@ -1,19 +1,55 @@
-"use client";
-
+import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { useModalStore, useFileStore } from "@/store";
 import { formatFileSize, formatExamType } from "@/lib/utils";
-import { Download } from "lucide-react";
+import { Download, Trash2, Loader2 } from "lucide-react";
 import { CommentSection } from "@/components/comment-section";
+import { useSession } from "next-auth/react";
+import { useToast } from "@/components/ui/use-toast";
 
 export function PreviewModal() {
     const { previewModalOpen, previewFileId, closePreviewModal } = useModalStore();
-    const { files } = useFileStore();
+    const { files, setFiles } = useFileStore();
+    const { data: session } = useSession();
+    const user = session?.user as any;
+    const { toast } = useToast();
+    const [deleting, setDeleting] = useState(false);
 
     const file = files.find((f) => f.id === previewFileId);
 
     if (!file) return null;
+
+    const handleDelete = async () => {
+        if (!confirm("Bu dosyayı silmek istediğinize emin misiniz? Bu işlem geri alınamaz.")) return;
+
+        setDeleting(true);
+        try {
+            const res = await fetch(`/api/files/${file.id}`, {
+                method: "DELETE",
+            });
+
+            if (res.ok) {
+                // Remove file from store
+                setFiles(files.filter(f => f.id !== file.id));
+                toast({
+                    title: "Dosya silindi",
+                    description: "Dosya başarıyla silindi.",
+                });
+                closePreviewModal();
+            } else {
+                throw new Error("Failed to delete");
+            }
+        } catch (error) {
+            toast({
+                title: "Hata",
+                description: "Dosya silinirken bir hata oluştu.",
+                variant: "destructive",
+            });
+        } finally {
+            setDeleting(false);
+        }
+    };
 
     return (
         <Dialog open={previewModalOpen} onOpenChange={(open) => !open && closePreviewModal()}>
@@ -25,12 +61,26 @@ export function PreviewModal() {
                             {file.universityName} • {file.year} {formatExamType(file.examType)} • {formatFileSize(file.fileSize)}
                         </p>
                     </div>
-                    <Button size="sm" className="ml-4 gap-2" asChild>
-                        <a href={file.previewUrl} download target="_blank" rel="noopener noreferrer">
-                            <Download className="h-4 w-4" />
-                            <span className="hidden sm:inline">İndir</span>
-                        </a>
-                    </Button>
+                    <div className="flex items-center ml-4 gap-2">
+                        {(user?.role === "admin" || user?.id === file.uploaderId) && (
+                            <Button
+                                variant="destructive"
+                                size="sm"
+                                className="gap-2"
+                                onClick={handleDelete}
+                                disabled={deleting}
+                            >
+                                {deleting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
+                                <span className="hidden sm:inline">Sil</span>
+                            </Button>
+                        )}
+                        <Button size="sm" className="gap-2" asChild>
+                            <a href={file.previewUrl} download target="_blank" rel="noopener noreferrer">
+                                <Download className="h-4 w-4" />
+                                <span className="hidden sm:inline">İndir</span>
+                            </a>
+                        </Button>
+                    </div>
                 </DialogHeader>
 
                 <div className="flex-1 bg-muted/30 p-0 overflow-hidden flex flex-col lg:flex-row relative h-full">
