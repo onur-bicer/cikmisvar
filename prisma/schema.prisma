@@ -17,6 +17,7 @@ model User {
   createdAt DateTime  @default(now())
   favorites Favorite[]
   uploads   File[]
+  comments  Comment[]
 }
 
 model University {
@@ -67,6 +68,7 @@ model File {
   createdAt      DateTime   @default(now())
   favorites      Favorite[]
   reports        Report[]
+  comments       Comment[]
 }
 
 model Favorite {
@@ -83,5 +85,15 @@ model Report {
   fileId    String
   file      File     @relation(fields: [fileId], references: [id])
   reason    String
+  createdAt DateTime @default(now())
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  text      String
+  fileId    String
+  file      File     @relation(fields: [fileId], references: [id])
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
   createdAt DateTime @default(now())
 }

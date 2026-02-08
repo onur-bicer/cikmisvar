@@ -1,39 +1,88 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { useFileStore, useAuthStore } from "@/store";
+import { useAuthStore } from "@/store";
 import { Comment } from "@/types";
-import { Send, User } from "lucide-react";
+import { Send, Loader2 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { tr } from "date-fns/locale";
+import { useToast } from "@/components/ui/use-toast";
 
 interface CommentSectionProps {
     fileId: string;
-    comments?: Comment[];
 }
 
-export function CommentSection({ fileId, comments = [] }: CommentSectionProps) {
-    const { addComment } = useFileStore();
+export function CommentSection({ fileId }: CommentSectionProps) {
     const { user } = useAuthStore();
+    const { toast } = useToast();
     const [text, setText] = useState("");
+    const [comments, setComments] = useState<Comment[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [submitting, setSubmitting] = useState(false);
 
-    const handleSubmit = (e: React.FormEvent) => {
+    // Fetch comments on mount
+    useEffect(() => {
+        const fetchComments = async () => {
+            try {
+                const res = await fetch(`/api/comments?fileId=${fileId}`);
+                if (res.ok) {
+                    const data = await res.json();
+                    setComments(data);
+                }
+            } catch (error) {
+                console.error("Failed to fetch comments:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchComments();
+    }, [fileId]);
+
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!text.trim()) return;
 
-        const newComment: Comment = {
-            id: `comment-${Date.now()}`,
-            text: text.trim(),
-            userName: user?.name || "Misafir Kullanıcı",
-            avatar: user?.avatar,
-            createdAt: new Date().toISOString(),
-        };
+        if (!user) {
+            toast({
+                title: "Giriş yapmalısınız",
+                description: "Yorum yapmak için giriş yapmanız gerekiyor.",
+                variant: "destructive",
+            });
+            return;
+        }
 
-        addComment(fileId, newComment);
-        setText("");
+        setSubmitting(true);
+
+        try {
+            const res = await fetch("/api/comments", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ fileId, text: text.trim() })
+            });
+
+            if (res.ok) {
+                const newComment = await res.json();
+                setComments(prev => [newComment, ...prev]);
+                setText("");
+                toast({
+                    title: "Yorum eklendi",
+                    description: "Yorumunuz başarıyla kaydedildi.",
+                });
+            } else {
+                throw new Error("Failed to submit");
+            }
+        } catch (error) {
+            toast({
+                title: "Hata",
+                description: "Yorum eklenirken bir hata oluştu.",
+                variant: "destructive",
+            });
+        } finally {
+            setSubmitting(false);
+        }
     };
 
     return (
@@ -48,7 +97,11 @@ export function CommentSection({ fileId, comments = [] }: CommentSectionProps) {
             </div>
 
             <div className="flex-1 overflow-y-auto p-4 space-y-4">
-                {comments.length === 0 ? (
+                {loading ? (
+                    <div className="flex items-center justify-center py-8">
+                        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+                    </div>
+                ) : comments.length === 0 ? (
                     <div className="text-center text-muted-foreground py-8 text-sm">
                         Henüz yorum yapılmamış. İlk yorumu sen yap!
                     </div>
@@ -82,9 +135,10 @@ export function CommentSection({ fileId, comments = [] }: CommentSectionProps) {
                         onChange={(e) => setText(e.target.value)}
                         placeholder="Yorum yaz..."
                         className="min-h-[44px] max-h-32 resize-none"
+                        disabled={submitting}
                     />
-                    <Button type="submit" size="icon" disabled={!text.trim()}>
-                        <Send className="h-4 w-4" />
+                    <Button type="submit" size="icon" disabled={!text.trim() || submitting}>
+                        {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
                     </Button>
                 </form>
             </div>
