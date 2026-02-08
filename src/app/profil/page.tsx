@@ -7,15 +7,26 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { FileText, Heart, Clock, Settings, LogOut, User as UserIcon } from "lucide-react";
+import { FileText, Star, Clock, Settings, LogOut, User as UserIcon, Eye } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { useModalStore, useFileStore } from "@/store";
+import { formatFileSize, formatExamType } from "@/lib/utils";
+import { PreviewModal } from "@/components/preview-modal";
+import { Toaster } from "@/components/ui/toaster";
+import { Badge } from "@/components/ui/badge";
 
 export default function ProfilePage() {
     const { data: session, status } = useSession();
     const router = useRouter();
 
     const [stats, setStats] = useState({ uploadCount: 0, favoriteCount: 0, totalViews: 0 });
+    const [userUploads, setUserUploads] = useState<any[]>([]);
+    const [userFavorites, setUserFavorites] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    const { openPreviewModal } = useModalStore();
+    const { toggleFavorite } = useFileStore();
 
     useEffect(() => {
         if (status === "unauthenticated") {
@@ -24,14 +35,26 @@ export default function ProfilePage() {
         }
 
         if (status === "authenticated") {
+            setLoading(true);
+
+            // Fetch stats
             fetch("/api/profile/stats")
                 .then(res => res.json())
-                .then(data => {
-                    if (data && typeof data.uploadCount === 'number') {
-                        setStats(data);
-                    }
-                })
-                .catch(err => console.error("Failed to fetch stats:", err));
+                .then(data => data && typeof data.uploadCount === 'number' && setStats(data))
+                .catch(err => console.error("Stats fetch error:", err));
+
+            // Fetch uploads
+            fetch("/api/profile/uploads")
+                .then(res => res.json())
+                .then(data => Array.isArray(data) && setUserUploads(data))
+                .catch(err => console.error("Uploads fetch error:", err));
+
+            // Fetch favorites
+            fetch("/api/profile/favorites")
+                .then(res => res.json())
+                .then(data => Array.isArray(data) && setUserFavorites(data))
+                .catch(err => console.error("Favorites fetch error:", err))
+                .finally(() => setLoading(false));
         }
     }, [status, router]);
 
@@ -97,7 +120,7 @@ export default function ProfilePage() {
                         <Card>
                             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                                 <CardTitle className="text-sm font-medium">Favoriler</CardTitle>
-                                <Heart className="h-4 w-4 text-muted-foreground" />
+                                <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
                             </CardHeader>
                             <CardContent>
                                 <div className="text-2xl font-bold">{stats.favoriteCount}</div>
@@ -125,43 +148,104 @@ export default function ProfilePage() {
                         </TabsList>
 
                         <TabsContent value="uploads" className="space-y-4">
-                            <Card>
-                                <CardHeader>
-                                    <CardTitle>Yüklemelerim</CardTitle>
-                                    <CardDescription>
-                                        Sisteme yüklediğin tüm ders notları ve sınav soruları.
-                                    </CardDescription>
-                                </CardHeader>
-                                <CardContent className="h-[200px] flex items-center justify-center text-muted-foreground border-dashed border-2 rounded-lg m-6">
-                                    <div className="text-center">
-                                        <FileText className="h-10 w-10 mx-auto mb-2 opacity-20" />
-                                        <p>Henüz yüklenmiş dosya yok</p>
-                                    </div>
-                                </CardContent>
-                            </Card>
+                            {userUploads.length > 0 ? (
+                                <div className="grid gap-4 sm:grid-cols-2">
+                                    {userUploads.map((file) => (
+                                        <Card key={file.id} className="flex flex-col p-5 hover:border-primary/40 transition-all">
+                                            <div className="flex items-start justify-between mb-4">
+                                                <div className="rounded-lg bg-primary/10 p-2 text-primary">
+                                                    <FileText className="h-6 w-6" />
+                                                </div>
+                                                <Badge variant="outline">{file.year}</Badge>
+                                            </div>
+                                            <h3 className="font-semibold text-lg line-clamp-1">{file.courseName}</h3>
+                                            <p className="text-sm text-muted-foreground mb-4 line-clamp-1">
+                                                {file.universityName} • {formatExamType(file.examType)}
+                                            </p>
+                                            <div className="mt-auto pt-4 flex gap-2 border-t border-border/50">
+                                                <Button
+                                                    onClick={() => openPreviewModal(file.id)}
+                                                    variant="default"
+                                                    size="sm"
+                                                    className="w-full bg-primary/90 hover:bg-primary shadow-sm"
+                                                >
+                                                    <Eye className="mr-2 h-4 w-4" /> İncele
+                                                </Button>
+                                            </div>
+                                        </Card>
+                                    ))}
+                                </div>
+                            ) : (
+                                <Card>
+                                    <CardContent className="h-[200px] flex items-center justify-center text-muted-foreground border-dashed border-2 rounded-lg m-6">
+                                        <div className="text-center">
+                                            <FileText className="h-10 w-10 mx-auto mb-2 opacity-20" />
+                                            <p>Henüz yüklenmiş dosya yok</p>
+                                        </div>
+                                    </CardContent>
+                                </Card>
+                            )}
                         </TabsContent>
 
                         <TabsContent value="favorites">
-                            <Card>
-                                <CardHeader>
-                                    <CardTitle>Favorilerim</CardTitle>
-                                    <CardDescription>
-                                        Hızlı erişim için kaydettiğin dersler.
-                                    </CardDescription>
-                                </CardHeader>
-                                <CardContent className="h-[200px] flex items-center justify-center text-muted-foreground border-dashed border-2 rounded-lg m-6">
-                                    <div className="text-center">
-                                        <Heart className="h-10 w-10 mx-auto mb-2 opacity-20" />
-                                        <p>Favori listesi boş</p>
-                                    </div>
-                                </CardContent>
-                            </Card>
+                            {userFavorites.length > 0 ? (
+                                <div className="grid gap-4 sm:grid-cols-2">
+                                    {userFavorites.map((file) => (
+                                        <Card key={file.id} className="flex flex-col p-5 hover:border-primary/40 transition-all">
+                                            <div className="flex items-start justify-between mb-4">
+                                                <div className="rounded-lg bg-yellow-500/10 p-2 text-yellow-600">
+                                                    <Star className="h-6 w-6 fill-yellow-500" />
+                                                </div>
+                                                <Badge variant="outline">{file.year}</Badge>
+                                            </div>
+                                            <h3 className="font-semibold text-lg line-clamp-1">{file.courseName}</h3>
+                                            <p className="text-sm text-muted-foreground mb-4 line-clamp-1">
+                                                {file.universityName} • {formatExamType(file.examType)}
+                                            </p>
+                                            <div className="mt-auto pt-4 flex gap-2 border-t border-border/50">
+                                                <Button
+                                                    onClick={() => openPreviewModal(file.id)}
+                                                    variant="default"
+                                                    size="sm"
+                                                    className="flex-1 bg-primary/90 hover:bg-primary shadow-sm"
+                                                >
+                                                    <Eye className="mr-2 h-4 w-4" /> İncele
+                                                </Button>
+                                                <Button
+                                                    variant="outline"
+                                                    size="sm"
+                                                    className="px-2.5 text-yellow-500 border-yellow-500/30 bg-yellow-500/5 hover:bg-yellow-500/10"
+                                                    onClick={async () => {
+                                                        await toggleFavorite(file.id);
+                                                        // Update local list
+                                                        setUserFavorites(prev => prev.filter(f => f.id !== file.id));
+                                                        setStats(prev => ({ ...prev, favoriteCount: prev.favoriteCount - 1 }));
+                                                    }}
+                                                >
+                                                    <Star className="h-4 w-4 fill-current" />
+                                                </Button>
+                                            </div>
+                                        </Card>
+                                    ))}
+                                </div>
+                            ) : (
+                                <Card>
+                                    <CardContent className="h-[200px] flex items-center justify-center text-muted-foreground border-dashed border-2 rounded-lg m-6">
+                                        <div className="text-center">
+                                            <Star className="h-10 w-10 mx-auto mb-2 opacity-20" />
+                                            <p>Favori listesi boş</p>
+                                        </div>
+                                    </CardContent>
+                                </Card>
+                            )}
                         </TabsContent>
                     </Tabs>
                 </div>
             </main>
 
             <Footer />
+            <PreviewModal />
+            <Toaster />
         </div>
     );
 }

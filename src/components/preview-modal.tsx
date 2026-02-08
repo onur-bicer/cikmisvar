@@ -81,6 +81,32 @@ export function PreviewModal() {
                                 <span className="hidden sm:inline">Sil</span>
                             </Button>
                         )}
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            className={`gap-2 ${file.isFavorite ? "text-yellow-500 border-yellow-500/30 bg-yellow-500/5 hover:bg-yellow-500/10" : ""}`}
+                            onClick={() => {
+                                if (user) {
+                                    useFileStore.getState().toggleFavorite(file.id);
+                                } else {
+                                    openAuthModal();
+                                }
+                            }}
+                        >
+                            <svg
+                                className={`h-4 w-4 ${file.isFavorite ? "fill-current" : ""}`}
+                                xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                            >
+                                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                            </svg>
+                            <span className="hidden sm:inline">{file.isFavorite ? "Favorilerde" : "Favoriye Ekle"}</span>
+                        </Button>
                         <Button size="sm" className="gap-2" asChild>
                             <a href={file.previewUrl} download target="_blank" rel="noopener noreferrer">
                                 <Download className="h-4 w-4" />

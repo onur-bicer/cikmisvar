@@ -337,9 +337,35 @@ export default function Home() {
                                             }}
                                             variant="default"
                                             size="sm"
-                                            className="w-full bg-primary/90 hover:bg-primary shadow-sm font-semibold"
+                                            className="flex-1 bg-primary/90 hover:bg-primary shadow-sm font-semibold"
                                         >
                                             <Eye className="mr-2 h-4 w-4" /> İncele
+                                        </Button>
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            className={`px-2.5 ${file.isFavorite ? "text-yellow-500 border-yellow-500/30 bg-yellow-500/5 hover:bg-yellow-500/10" : ""}`}
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                if (user) {
+                                                    useFileStore.getState().toggleFavorite(file.id);
+                                                } else {
+                                                    openAuthModal();
+                                                }
+                                            }}
+                                        >
+                                            <svg
+                                                className={`h-4 w-4 ${file.isFavorite ? "fill-current" : ""}`}
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                viewBox="0 0 24 24"
+                                                fill="none"
+                                                stroke="currentColor"
+                                                strokeWidth="2"
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                            >
+                                                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                                            </svg>
                                         </Button>
                                     </div>
                                 </Card>

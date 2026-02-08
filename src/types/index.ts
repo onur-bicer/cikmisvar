@@ -34,6 +34,7 @@ export interface ExamFile {
     uploadedAt: string;
     viewCount: number;
     previewUrl?: string; // Blob URL or CDN URL
+    isFavorite?: boolean;
     comments?: Comment[];
 }
 

@@ -7,6 +7,7 @@ interface FileState {
     setFiles: (files: ExamFile[]) => void;
     addFile: (file: ExamFile) => void;
     addComment: (fileId: string, comment: any) => void;
+    toggleFavorite: (fileId: string) => Promise<void>;
     fetchFiles: (query?: string) => Promise<void>;
     refreshFiles: () => Promise<void>;
 }
@@ -30,6 +31,37 @@ export const useFileStore = create<FileState>((set, get) => ({
             return file;
         })
     })),
+
+    toggleFavorite: async (fileId) => {
+        // Optimistic update
+        set((state) => ({
+            files: state.files.map((file) =>
+                file.id === fileId ? { ...file, isFavorite: !file.isFavorite } : file
+            )
+        }));
+
+        try {
+            const response = await fetch(`/api/files/${fileId}/favorite`, {
+                method: "POST",
+            });
+            if (!response.ok) {
+                // Revert on failure
+                set((state) => ({
+                    files: state.files.map((file) =>
+                        file.id === fileId ? { ...file, isFavorite: !file.isFavorite } : file
+                    )
+                }));
+            }
+        } catch (error) {
+            console.error("Failed to toggle favorite:", error);
+            // Revert on failure
+            set((state) => ({
+                files: state.files.map((file) =>
+                    file.id === fileId ? { ...file, isFavorite: !file.isFavorite } : file
+                )
+            }));
+        }
+    },
 
     fetchFiles: async (query?: string) => {
         set({ loading: true });

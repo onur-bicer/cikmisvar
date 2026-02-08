@@ -58,6 +58,9 @@ export async function GET(req: Request) {
                         university: { select: { name: true } },
                         department: { select: { name: true } },
                         course: { select: { name: true } },
+                        favorites: userId ? {
+                            where: { userId }
+                        } : false,
                     },
                     take: 2,
                     orderBy: { views: "desc" }
@@ -78,6 +81,9 @@ export async function GET(req: Request) {
                     university: { select: { name: true } },
                     department: { select: { name: true } },
                     course: { select: { name: true } },
+                    favorites: userId ? {
+                        where: { userId }
+                    } : false,
                 },
                 orderBy: { views: "desc" },
                 take: 6 - recommendedFiles.length
@@ -101,6 +107,7 @@ export async function GET(req: Request) {
             uploadedAt: file.createdAt.toISOString(),
             viewCount: file.views,
             previewUrl: file.filePath,
+            isFavorite: file.favorites?.length > 0,
         }));
 
         return NextResponse.json(formattedFiles);
