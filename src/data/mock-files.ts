@@ -3,6 +3,7 @@ import { ExamFile } from "@/types";
 export const mockFiles: ExamFile[] = [
     {
         id: "file-1",
+        uploaderId: "user-mock-1",
         universityId: "uni-1",
         universityName: "İstanbul Teknik Üniversitesi",
         departmentId: "dep-1",
@@ -17,6 +18,7 @@ export const mockFiles: ExamFile[] = [
     },
     {
         id: "file-2",
+        uploaderId: "user-mock-1",
         universityId: "uni-1",
         universityName: "İstanbul Teknik Üniversitesi",
         departmentId: "dep-1",
@@ -31,6 +33,7 @@ export const mockFiles: ExamFile[] = [
     },
     {
         id: "file-3",
+        uploaderId: "user-mock-1",
         universityId: "uni-2",
         universityName: "Orta Doğu Teknik Üniversitesi",
         departmentId: "dep-4",
@@ -45,6 +48,7 @@ export const mockFiles: ExamFile[] = [
     },
     {
         id: "file-4",
+        uploaderId: "user-mock-1",
         universityId: "uni-1",
         universityName: "İstanbul Teknik Üniversitesi",
         departmentId: "dep-2",
@@ -59,6 +63,7 @@ export const mockFiles: ExamFile[] = [
     },
     {
         id: "file-5",
+        uploaderId: "user-mock-1",
         universityId: "uni-2",
         universityName: "Orta Doğu Teknik Üniversitesi",
         departmentId: "dep-5",
@@ -73,6 +78,7 @@ export const mockFiles: ExamFile[] = [
     },
     {
         id: "file-6",
+        uploaderId: "user-mock-1",
         universityId: "uni-1",
         universityName: "İstanbul Teknik Üniversitesi",
         departmentId: "dep-1",
@@ -87,6 +93,7 @@ export const mockFiles: ExamFile[] = [
     },
     {
         id: "file-7",
+        uploaderId: "user-mock-1",
         universityId: "uni-2",
         universityName: "Orta Doğu Teknik Üniversitesi",
         departmentId: "dep-4",
@@ -101,6 +108,7 @@ export const mockFiles: ExamFile[] = [
     },
     {
         id: "file-8",
+        uploaderId: "user-mock-1",
         universityId: "uni-1",
         universityName: "İstanbul Teknik Üniversitesi",
         departmentId: "dep-3",
@@ -115,6 +123,7 @@ export const mockFiles: ExamFile[] = [
     },
     {
         id: "file-9",
+        uploaderId: "user-mock-1",
         universityId: "uni-2",
         universityName: "Orta Doğu Teknik Üniversitesi",
         departmentId: "dep-5",
@@ -129,6 +138,7 @@ export const mockFiles: ExamFile[] = [
     },
     {
         id: "file-10",
+        uploaderId: "user-mock-1",
         universityId: "uni-1",
         universityName: "İstanbul Teknik Üniversitesi",
         departmentId: "dep-2",
