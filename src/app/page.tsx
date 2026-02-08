@@ -139,12 +139,12 @@ export default function Home() {
                                 Neden Çıkmış Var?
                             </div>
 
-                            <h1 className="text-4xl font-black tracking-tight text-gray-900 sm:text-5xl lg:text-6xl xl:text-7xl leading-tight">
+                            <h1 className="text-3xl font-black tracking-tight text-gray-900 sm:text-4xl lg:text-5xl xl:text-6xl leading-tight">
                                 Sınav hazırlığını <br />
                                 <span className="text-gray-900">kolaylaştır</span>
                             </h1>
 
-                            <p className="max-w-xl text-lg text-gray-600 sm:text-xl">
+                            <p className="max-w-xl text-base text-gray-600 sm:text-lg">
                                 Türkiye&rsquo;nin en kapsamlı çıkmış soru arşivine ücretsiz eriş
                             </p>
 
@@ -154,7 +154,7 @@ export default function Home() {
                                     <div className="relative flex items-center">
                                         <Search className="absolute left-4 h-5 w-5 text-gray-400 pointer-events-none" />
                                         <Input
-                                            className="h-14 lg:h-16 w-full rounded-2xl border-2 border-gray-200 bg-white pl-12 pr-32 text-lg shadow-sm transition-all focus-visible:border-blue-500 focus-visible:ring-4 focus-visible:ring-blue-500/10"
+                                            className="h-14 lg:h-16 w-full rounded-2xl border-2 border-gray-200 bg-white pl-12 pr-32 text-base shadow-sm transition-all focus-visible:border-blue-500 focus-visible:ring-4 focus-visible:ring-blue-500/10"
                                             placeholder="Üniversite, bölüm veya ders ara..."
                                             value={query}
                                             onChange={(e) => setQuery(e.target.value)}
@@ -233,12 +233,12 @@ export default function Home() {
                             </div>
 
                             <div className="flex flex-col sm:flex-row gap-4 pt-4">
-                                <Button size="lg" className="h-14 px-8 text-lg rounded-xl bg-blue-600 hover:bg-blue-700 hover:scale-105 transition-all duration-300 shadow-lg shadow-blue-600/20" onClick={() => {
+                                <Button size="lg" className="h-14 px-8 text-base rounded-xl bg-blue-600 hover:bg-blue-700 hover:scale-105 transition-all duration-300 shadow-lg shadow-blue-600/20" onClick={() => {
                                     ctaRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
                                 }}>
                                     Hemen Başla
                                 </Button>
-                                <Button size="lg" variant="outline" className="h-14 px-8 text-lg rounded-xl border-2 hover:bg-gray-50 hover:border-blue-200 hover:text-blue-600 transition-all duration-300" onClick={() => router.push("/icerikler")}>
+                                <Button size="lg" variant="outline" className="h-14 px-8 text-base rounded-xl border-2 hover:bg-gray-50 hover:border-blue-200 hover:text-blue-600 transition-all duration-300" onClick={() => router.push("/icerikler")}>
                                     Soru Arşivine Gözat
                                 </Button>
                             </div>
@@ -295,7 +295,7 @@ export default function Home() {
                             <div className="h-14 w-14 bg-green-50 rounded-xl flex items-center justify-center mb-6">
                                 <DollarSign className="h-7 w-7 text-green-600" />
                             </div>
-                            <h3 className="text-xl font-bold text-gray-900 mb-3">%100 Ücretsiz</h3>
+                            <h3 className="text-lg font-bold text-gray-900 mb-3">%100 Ücretsiz</h3>
                             <p className="text-gray-600 leading-relaxed">
                                 Tüm sınav sorularına tamamen ücretsiz eriş. Gizli ücret yok, abonelik yok.
                             </p>
@@ -313,7 +313,7 @@ export default function Home() {
                             <div className="h-14 w-14 bg-orange-50 rounded-xl flex items-center justify-center mb-6">
                                 <Zap className="h-7 w-7 text-orange-600" />
                             </div>
-                            <h3 className="text-xl font-bold text-gray-900 mb-3">Anında Erişim</h3>
+                            <h3 className="text-lg font-bold text-gray-900 mb-3">Anında Erişim</h3>
                             <p className="text-gray-600 leading-relaxed">
                                 Saniyeler içinde aradığın sınavı bul. Akıllı arama ve gelişmiş filtreleme özellikleri.
                             </p>
@@ -331,7 +331,7 @@ export default function Home() {
                             <div className="h-14 w-14 bg-blue-50 rounded-xl flex items-center justify-center mb-6">
                                 <Shield className="h-7 w-7 text-blue-600" />
                             </div>
-                            <h3 className="text-xl font-bold text-gray-900 mb-3">Doğrulanmış</h3>
+                            <h3 className="text-lg font-bold text-gray-900 mb-3">Doğrulanmış</h3>
                             <p className="text-gray-600 leading-relaxed">
                                 Öğrenciler tarafından yüklenmiş gerçek sınav soruları. Topluluk onaylı içerik.
                             </p>
@@ -342,7 +342,7 @@ export default function Home() {
                 {/* Popular Files Section (Adapting style to match new design) */}
                 <section className="container mx-auto px-4 py-20">
                     <div className="flex justify-between items-center mb-10">
-                        <h2 className="text-3xl font-bold text-gray-900 tracking-tight">
+                        <h2 className="text-2xl font-bold text-gray-900 tracking-tight">
                             Popüler Dosyalar
                         </h2>
                         <Button variant="ghost" className="text-blue-600 hover:text-blue-700 hover:bg-blue-50" onClick={() => router.push("/icerikler")}>
@@ -396,10 +396,10 @@ export default function Home() {
                                 viewport={{ once: true }}
                                 className="space-y-2"
                             >
-                                <div className="text-5xl lg:text-6xl font-black text-blue-600">
+                                <div className="text-4xl lg:text-5xl font-black text-blue-600">
                                     <Counter from={0} to={1200} />+
                                 </div>
-                                <div className="text-lg font-medium text-gray-600">Sınav Dosyası</div>
+                                <div className="text-base font-medium text-gray-600">Sınav Dosyası</div>
                             </motion.div>
                             <motion.div
                                 initial={{ scale: 0.5, opacity: 0 }}
@@ -408,10 +408,10 @@ export default function Home() {
                                 transition={{ delay: 0.1 }}
                                 className="space-y-2"
                             >
-                                <div className="text-5xl lg:text-6xl font-black text-blue-600">
+                                <div className="text-4xl lg:text-5xl font-black text-blue-600">
                                     <Counter from={0} to={50} />+
                                 </div>
-                                <div className="text-lg font-medium text-gray-600">Üniversite</div>
+                                <div className="text-base font-medium text-gray-600">Üniversite</div>
                             </motion.div>
                             <motion.div
                                 initial={{ scale: 0.5, opacity: 0 }}
@@ -420,10 +420,10 @@ export default function Home() {
                                 transition={{ delay: 0.2 }}
                                 className="space-y-2"
                             >
-                                <div className="text-5xl lg:text-6xl font-black text-blue-600">
+                                <div className="text-4xl lg:text-5xl font-black text-blue-600">
                                     <Counter from={0} to={10000} />+
                                 </div>
-                                <div className="text-lg font-medium text-gray-600">Aktif Kullanıcı</div>
+                                <div className="text-base font-medium text-gray-600">Aktif Kullanıcı</div>
                             </motion.div>
                         </div>
                     </div>
@@ -437,10 +437,10 @@ export default function Home() {
                         <div className="absolute bottom-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl translate-x-1/2 translate-y-1/2 animate-pulse delay-700" />
 
                         <div className="relative z-10 max-w-2xl mx-auto space-y-8">
-                            <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl md:text-5xl">
+                            <h2 className="text-2xl font-bold tracking-tight text-white sm:text-3xl md:text-4xl">
                                 Arşive katkı sağla
                             </h2>
-                            <p className="text-lg text-blue-100 max-w-lg mx-auto">
+                            <p className="text-base text-blue-100 max-w-lg mx-auto">
                                 Elindeki çıkmış soruları yükleyerek diğer öğrencilere destek ol ve topluluğumuzu büyüt.
                             </p>
 
@@ -448,7 +448,7 @@ export default function Home() {
                                 <Button
                                     onClick={handleUploadClick}
                                     size="lg"
-                                    className="bg-white text-blue-700 hover:bg-blue-50 font-bold h-14 px-10 text-lg rounded-xl shadow-lg"
+                                    className="bg-white text-blue-700 hover:bg-blue-50 font-bold h-14 px-10 text-base rounded-xl shadow-lg"
                                 >
                                     <Upload className="mr-2 h-5 w-5" />
                                     Dosya Yükle
