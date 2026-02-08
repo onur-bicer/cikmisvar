@@ -24,7 +24,7 @@ export default function Home() {
     const router = useRouter();
     const { data: session } = useSession();
     const { user } = useAuthStore();
-    const { openAuthModal, openUploadModal } = useModalStore();
+    const { openAuthModal, openUploadModal, openPreviewModal } = useModalStore();
     const { query, setQuery, setActiveChip, activeChip } = useSearchStore();
     const { files, fetchFiles } = useFileStore();
     const [mounted, setMounted] = useState(false);
