@@ -30,69 +30,82 @@ async function main() {
     })
 
     // Universities
-    const uni1 = await prisma.university.create({
-        data: {
-            name: 'İstanbul Teknik Üniversitesi',
-            city: 'İstanbul',
-            departments: {
-                create: [
-                    {
-                        name: 'Bilgisayar Mühendisliği',
-                        courses: {
-                            create: [
-                                { name: 'Veri Yapıları' },
-                                { name: 'Algoritma Analizi' },
-                                { name: 'İşletim Sistemleri' },
-                            ],
-                        },
-                    },
-                    {
-                        name: 'Makine Mühendisliği',
-                        courses: {
-                            create: [
-                                { name: 'Termodinamik' },
-                                { name: 'Akışkanlar Mekaniği' },
-                            ],
-                        },
-                    },
-                ],
-            },
-        },
-    })
+    // Universities
+    const { universities } = require('../src/data/universities')
 
-    // Add files to first course
-    const dep1 = await prisma.department.findFirst({ where: { universityId: uni1.id } })
-    const course1 = await prisma.course.findFirst({ where: { departmentId: dep1?.id } })
+    console.log(`Seeding ${universities.length} universities...`)
 
-    if (dep1 && course1) {
-        await prisma.file.createMany({
-            data: [
-                {
-                    universityId: uni1.id,
-                    departmentId: dep1.id,
-                    courseId: course1.id,
-                    year: 2023,
-                    examType: 'FINAL',
-                    filePath: '/uploads/sample1.pdf',
-                    fileSize: 1024 * 500,
-                    uploaderId: admin.id,
-                    status: 'approved',
-                    views: 120,
-                },
-                {
-                    universityId: uni1.id,
-                    departmentId: dep1.id,
-                    courseId: course1.id,
-                    year: 2022,
-                    examType: 'MIDTERM',
-                    filePath: '/uploads/sample2.pdf',
-                    fileSize: 1024 * 300,
-                    uploaderId: user.id,
-                    status: 'pending',
-                },
-            ],
+    for (const uni of universities) {
+        await prisma.university.upsert({
+            where: { name: uni.name },
+            update: {},
+            create: {
+                // id: uni.id, // Optional: Keep static IDs if desired, or let DB generate new ones. 
+                // Using name as unique key for upsert, but creating with generated ID is safer if IDs match.
+                // Let's rely on name uniqueness for now or just create.
+                name: uni.name,
+                city: uni.city || '',
+                departments: {
+                    create: uni.departments.map((dep: any) => ({
+                        name: dep.name,
+                        courses: {
+                            create: dep.courses.map((course: any) => ({
+                                name: course.name
+                            }))
+                        }
+                    }))
+                }
+            }
         })
+
+        // Since nested upsert is tricky with arrays, let's just create university if not exists, 
+        // then iteratively upsert departments and courses.
+        // Actually, for simplicity and since it's a migration, let's look up the university first.
+
+        const dbUni = await prisma.university.upsert({
+            where: { name: uni.name },
+            update: {},
+            create: {
+                name: uni.name,
+                city: uni.city || ''
+            }
+        })
+
+        for (const dep of uni.departments) {
+            const dbDep = await prisma.department.upsert({
+                where: {
+                    name_universityId: {
+                        name: dep.name,
+                        universityId: dbUni.id
+                    }
+                },
+                update: {},
+                create: {
+                    name: dep.name,
+                    universityId: dbUni.id
+                }
+            })
+
+            for (const course of dep.courses) {
+                await prisma.course.upsert({
+                    where: {
+                        name_departmentId: {
+                            name: course.name,
+                            departmentId: dbDep.id
+                        }
+                    },
+                    update: {},
+                    create: {
+                        name: course.name,
+                        departmentId: dbDep.id
+                    }
+                })
+            }
+        }
     }
+
+    // Dummy files can be removed or updated to fetch a real university if needed for testing.
+    // For now, let's keep the seed clean with just the structure.
 
     console.log('Seed data created.')
 }

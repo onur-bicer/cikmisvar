@@ -21,7 +21,7 @@ model User {
 
 model University {
   id          String       @id @default(cuid())
-  name        String
+  name        String       @unique
   city        String?
   departments Department[]
   files       File[]
@@ -34,6 +34,8 @@ model Department {
   university   University @relation(fields: [universityId], references: [id])
   courses      Course[]
   files        File[]
+
+  @@unique([name, universityId])
 }
 
 model Course {
@@ -42,6 +44,8 @@ model Course {
   departmentId String
   department   Department @relation(fields: [departmentId], references: [id])
   files        File[]
+
+  @@unique([name, departmentId])
 }
 
 model File {
