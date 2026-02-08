@@ -187,7 +187,7 @@ export function CommentSection({ fileId }: CommentSectionProps) {
                                 handleSubmit(e);
                             }
                         }}
-                        placeholder="Yorum yaz... (Enter ile gönder)"
+                        placeholder="Yorum yaz..."
                         className="min-h-[44px] max-h-32 resize-none"
                         disabled={submitting}
                     />
