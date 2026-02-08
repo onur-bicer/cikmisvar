@@ -148,28 +148,29 @@ export function CommentSection({ fileId }: CommentSectionProps) {
                             <div className="flex-1 space-y-1">
                                 <div className="flex items-center justify-between">
                                     <span className="text-sm font-medium">{comment.userName}</span>
-                                    <span className="text-xs text-muted-foreground">
-                                        {formatDistanceToNow(new Date(comment.createdAt), { addSuffix: true, locale: tr })}
-                                    </span>
+                                    <div className="flex items-center gap-2">
+                                        <span className="text-xs text-muted-foreground">
+                                            {formatDistanceToNow(new Date(comment.createdAt), { addSuffix: true, locale: tr })}
+                                        </span>
+                                        {(user?.role === "admin" || user?.id === comment.userId) && (
+                                            <Button
+                                                variant="ghost"
+                                                size="icon"
+                                                className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-destructive shrink-0"
+                                                onClick={() => handleDelete(comment.id)}
+                                                disabled={deletingId === comment.id}
+                                            >
+                                                {deletingId === comment.id ? (
+                                                    <Loader2 className="h-3 w-3 animate-spin" />
+                                                ) : (
+                                                    <Trash2 className="h-3 w-3" />
+                                                )}
+                                            </Button>
+                                        )}
+                                    </div>
                                 </div>
-                                <p className="text-sm text-foreground/90 whitespace-pre-wrap pr-6">{comment.text}</p>
+                                <p className="text-sm text-foreground/90 whitespace-pre-wrap pr-2">{comment.text}</p>
                             </div>
-
-                            {(user?.role === "admin" || user?.id === comment.userId) && (
-                                <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    className="h-6 w-6 absolute top-0 right-0 opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-destructive"
-                                    onClick={() => handleDelete(comment.id)}
-                                    disabled={deletingId === comment.id}
-                                >
-                                    {deletingId === comment.id ? (
-                                        <Loader2 className="h-3 w-3 animate-spin" />
-                                    ) : (
-                                        <Trash2 className="h-3 w-3" />
-                                    )}
-                                </Button>
-                            )}
                         </div>
                     ))
                 )}
