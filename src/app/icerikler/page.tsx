@@ -277,7 +277,7 @@ export default function ContentsPage() {
                                 ))}
                             </div>
                         ) : filteredFiles.length > 0 ? (
-                            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                                 {filteredFiles.map((file) => (
                                     <Card key={file.id} className="flex flex-col p-5 transition-all hover:border-primary/40 hover:shadow-md group">
                                         <div className="flex items-start justify-between mb-4">
@@ -355,20 +355,7 @@ export default function ContentsPage() {
                         )}
                     </div>
 
-                    {/* Right Preview Panel (Desktop Only) */}
-                    <div className="hidden xl:block w-[350px] flex-shrink-0">
-                        <div className="sticky top-24">
-                            <Card className="p-6 border-dashed border-2 flex flex-col items-center justify-center text-center min-h-[400px] bg-muted/20">
-                                <div className="rounded-full bg-muted p-4 mb-4">
-                                    <Eye className="h-8 w-8 text-muted-foreground" />
-                                </div>
-                                <h3 className="font-medium mb-2">Hızlı Önizleme</h3>
-                                <p className="text-sm text-muted-foreground max-w-[200px]">
-                                    Detaylı incelemek için listeden bir dosyanın &quot;Önizle&quot; butonuna tıklayın.
-                                </p>
-                            </Card>
-                        </div>
-                    </div>
+
                 </div>
             </main>
 

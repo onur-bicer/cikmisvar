@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { FileText, Star, Clock, Settings, LogOut, User as UserIcon, Eye } from "lucide-react";
+import { FileText, Star, Clock, Settings, LogOut, User as UserIcon, Eye, LayoutDashboard } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useModalStore, useFileStore } from "@/store";
@@ -94,6 +94,17 @@ export default function ProfilePage() {
                         </div>
 
                         <div className="flex gap-2">
+                            {(user as any).role === "admin" && (
+                                <Button
+                                    variant="default"
+                                    size="sm"
+                                    className="bg-primary/90 hover:bg-primary font-semibold"
+                                    onClick={() => router.push("/admin")}
+                                >
+                                    <LayoutDashboard className="mr-2 h-4 w-4" />
+                                    Yönetim Paneli
+                                </Button>
+                            )}
                             <Button variant="outline" size="sm" onClick={() => router.push("/ayarlar")}>
                                 <Settings className="mr-2 h-4 w-4" />
                                 Ayarlar

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Moon, Sun, User as UserIcon, LogOut, Upload, Settings, User } from "lucide-react";
+import { Moon, Sun, User as UserIcon, LogOut, Upload, Settings, User, LayoutDashboard } from "lucide-react";
 import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
 import { useModalStore } from "@/store";
@@ -110,8 +110,8 @@ export function Navbar() {
                                         </DropdownMenuItem>
                                         {(user as any).role === "admin" && (
                                             <DropdownMenuItem asChild>
-                                                <Link href="/admin" className="flex w-full items-center">
-                                                    <Settings className="mr-2 h-4 w-4" />
+                                                <Link href="/admin" className="flex w-full items-center font-semibold text-primary">
+                                                    <LayoutDashboard className="mr-2 h-4 w-4" />
                                                     <span>Yönetim Paneli</span>
                                                 </Link>
                                             </DropdownMenuItem>
