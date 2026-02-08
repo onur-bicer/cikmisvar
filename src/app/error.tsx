@@ -11,7 +11,7 @@ export default function Error({
     reset: () => void;
 }) {
     useEffect(() => {
-        console.error(error);
+        console.error("Page error:", error);
     }, [error]);
 
     return (
@@ -20,6 +20,11 @@ export default function Error({
             <p className="text-muted-foreground mb-6 max-w-md">
                 Beklenmedik bir hata oluştu. Lütfen tekrar deneyin.
             </p>
+            {process.env.NODE_ENV !== "production" && (
+                <p className="text-xs text-red-500 mb-4 max-w-md break-all font-mono">
+                    {error.message}
+                </p>
+            )}
             <div className="flex gap-4">
                 <Button onClick={() => window.location.reload()} variant="outline">
                     Sayfayı Yenile
@@ -29,3 +34,4 @@ export default function Error({
         </div>
     );
 }
+

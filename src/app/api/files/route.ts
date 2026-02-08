@@ -18,7 +18,7 @@ export async function GET(req: Request) {
     const sort = searchParams.get("sort") || "recent"; // recent, popular
 
     const where: any = {
-        status: "approved", // Only show approved files by default? Or all for now
+        // Show all files for now (both approved and pending)
     };
 
     if (q) {
