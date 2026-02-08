@@ -152,7 +152,7 @@ export default function Home() {
                 <div className="absolute top-0 left-1/2 -z-10 h-[800px] w-[800px] -translate-x-1/2 rounded-full bg-primary/5 blur-3xl" />
 
                 {/* Hero Section */}
-                <section className="relative overflow-hidden pt-20 pb-28 lg:pt-36 lg:pb-44">
+                <section className="relative overflow-hidden pt-20 pb-12 lg:pt-36 lg:pb-20">
                     <div className="container relative z-10 mx-auto px-4 text-center">
                         <h1 className="mb-4 text-4xl font-black tracking-tight sm:text-5xl lg:text-7xl text-foreground">
                             Geçmiş sınavları saniyeler içinde bul
@@ -270,7 +270,7 @@ export default function Home() {
                 </section>
 
                 {/* Popular Files Section */}
-                <section className="container mx-auto py-24">
+                <section className="container mx-auto py-16">
                     <div className="max-w-6xl mx-auto">
                         <div className="flex justify-between items-center mb-12">
                             <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
