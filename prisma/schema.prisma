@@ -18,6 +18,7 @@ model User {
   favorites Favorite[]
   uploads   File[]
   comments  Comment[]
+  searches  SearchHistory[]
 }
 
 model University {
@@ -95,5 +96,14 @@ model Comment {
   file      File     @relation(fields: [fileId], references: [id], onDelete: Cascade)
   userId    String
   user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+}
+
+model SearchHistory {
+  id        String   @id @default(cuid())
+  term      String
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id])
+  ipAddress String?
   createdAt DateTime @default(now())
 }

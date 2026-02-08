@@ -18,8 +18,11 @@ import { popularSearches } from "@/data/popular-searches";
 import { universities } from "@/data/universities";
 import { formatFileSize, formatExamType, formatDate } from "@/lib/utils";
 
+import { useSession } from "next-auth/react";
+
 export default function Home() {
     const router = useRouter();
+    const { data: session } = useSession();
     const { user } = useAuthStore();
     const { openAuthModal, openUploadModal } = useModalStore();
     const { query, setQuery, setActiveChip, activeChip } = useSearchStore();
@@ -86,6 +89,11 @@ export default function Home() {
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
         if (query.trim()) {
+            // Log search
+            fetch("/api/search/log", {
+                method: "POST",
+                body: JSON.stringify({ term: query }),
+            });
             router.push("/icerikler");
         }
     };
@@ -94,6 +102,11 @@ export default function Home() {
         setActiveChip(chip.id);
         setQuery(chip.query);
         if (chip.query) {
+            // Log search
+            fetch("/api/search/log", {
+                method: "POST",
+                body: JSON.stringify({ term: chip.query }),
+            });
             router.push("/icerikler");
         }
     };
@@ -107,6 +120,22 @@ export default function Home() {
     };
 
     if (!mounted) return null;
+
+    // Recommended files state
+    const [recommendedFiles, setRecommendedFiles] = useState<any[]>([]);
+
+    useEffect(() => {
+        if (session?.user) {
+            fetch("/api/files/recommended")
+                .then(res => res.json())
+                .then(data => {
+                    if (Array.isArray(data)) {
+                        setRecommendedFiles(data);
+                    }
+                })
+                .catch(err => console.error("Failed to fetch recommendations:", err));
+        }
+    }, [session]);
 
     return (
         <div className="flex min-h-screen flex-col">
@@ -229,6 +258,55 @@ export default function Home() {
                                         </div>
                                     </div>
                                 )}
+                            </div>
+
+                            {/* Recommended Section for Logged In Users */}
+                            {session?.user && recommendedFiles.length > 0 && (
+                                <div className="mb-12 animate-fade-in text-left">
+                                    <h2 className="text-2xl font-bold mb-6 flex items-center gap-2 justify-center lg:justify-start">
+                                        <BookOpen className="h-6 w-6 text-primary" />
+                                        Sizin İçin Önerilenler
+                                    </h2>
+                                    <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 text-left">
+                                        {recommendedFiles.map((file) => (
+                                            <Card key={file.id} className="flex flex-col p-5 transition-all hover:border-primary/40 hover:shadow-lg group bg-card/50 backdrop-blur-sm border-muted/60">
+                                                <div className="flex items-start justify-between mb-4">
+                                                    <div className="rounded-lg bg-primary/10 p-2 text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-colors duration-300">
+                                                        <FileText className="h-5 w-5" />
+                                                    </div>
+                                                    <span className="text-xs font-medium text-muted-foreground border bg-background/50 px-2.5 py-1 rounded-full">
+                                                        {file.year}
+                                                    </span>
+                                                </div>
+
+                                                <h3 className="font-bold text-lg mb-1 line-clamp-1 group-hover:text-primary transition-colors">
+                                                    {file.courseName}
+                                                </h3>
+                                                <p className="text-sm font-medium text-muted-foreground mb-1 line-clamp-1">
+                                                    {file.universityName}
+                                                </p>
+                                                <p className="text-xs text-muted-foreground/80 mb-5">
+                                                    {formatExamType(file.examType)} • {formatFileSize(file.fileSize)}
+                                                </p>
+
+                                                <div className="mt-auto pt-4 flex gap-2 border-t border-border/50">
+                                                    <Button
+                                                        onClick={() => openPreviewModal(file.id)}
+                                                        variant="default"
+                                                        size="sm"
+                                                        className="w-full bg-primary/90 hover:bg-primary shadow-sm font-semibold"
+                                                    >
+                                                        <Eye className="mr-2 h-4 w-4" /> İncele
+                                                    </Button>
+                                                </div>
+                                            </Card>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
+                            <div className="mb-4 text-center">
+                                <span className="text-sm font-medium text-muted-foreground">Popüler Aramalar</span>
                             </div>
 
                             <div className="flex flex-wrap justify-center gap-2">

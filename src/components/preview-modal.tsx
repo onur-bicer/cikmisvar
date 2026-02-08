@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { useModalStore, useFileStore } from "@/store";
@@ -17,6 +17,13 @@ export function PreviewModal() {
     const [deleting, setDeleting] = useState(false);
 
     const file = files.find((f) => f.id === previewFileId);
+
+    // Increment view count on mount
+    useEffect(() => {
+        if (file && previewModalOpen) {
+            fetch(`/api/files/${file.id}/view`, { method: "POST" });
+        }
+    }, [file, previewModalOpen]);
 
     if (!file) return null;
 

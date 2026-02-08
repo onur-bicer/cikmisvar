@@ -180,7 +180,13 @@ export function CommentSection({ fileId }: CommentSectionProps) {
                     <Textarea
                         value={text}
                         onChange={(e) => setText(e.target.value)}
-                        placeholder="Yorum yaz..."
+                        onKeyDown={(e) => {
+                            if (e.key === "Enter" && !e.shiftKey) {
+                                e.preventDefault();
+                                handleSubmit(e);
+                            }
+                        }}
+                        placeholder="Yorum yaz... (Enter ile gönder)"
                         className="min-h-[44px] max-h-32 resize-none"
                         disabled={submitting}
                     />
