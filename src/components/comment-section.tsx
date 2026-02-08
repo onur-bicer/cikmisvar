@@ -177,7 +177,7 @@ export function CommentSection({ fileId }: CommentSectionProps) {
             </div>
 
             <div className="p-4 border-t mt-auto bg-background">
-                <form onSubmit={handleSubmit} className="flex gap-2">
+                <form onSubmit={handleSubmit} className="flex gap-2 items-end">
                     <Textarea
                         value={text}
                         onChange={(e) => setText(e.target.value)}
@@ -188,10 +188,10 @@ export function CommentSection({ fileId }: CommentSectionProps) {
                             }
                         }}
                         placeholder="Yorum yaz..."
-                        className="min-h-[44px] max-h-32 resize-none"
+                        className="min-h-[44px] max-h-32 resize-none flex-1"
                         disabled={submitting}
                     />
-                    <Button type="submit" size="icon" disabled={!text.trim() || submitting}>
+                    <Button type="submit" size="icon" className="shrink-0" disabled={!text.trim() || submitting}>
                         {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
                     </Button>
                 </form>

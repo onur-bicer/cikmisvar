@@ -66,6 +66,7 @@ export async function GET(req: Request) {
             fileSize: file.fileSize,
             uploadedAt: file.createdAt.toISOString(),
             viewCount: file.views,
+            downloadCount: file.downloads,
             previewUrl: file.filePath,
             isFavorite: (file as any).favorites?.length > 0,
         }));

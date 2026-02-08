@@ -33,6 +33,7 @@ export interface ExamFile {
     fileSize: number;
     uploadedAt: string;
     viewCount: number;
+    downloadCount: number;
     previewUrl?: string; // Blob URL or CDN URL
     isFavorite?: boolean;
     comments?: Comment[];

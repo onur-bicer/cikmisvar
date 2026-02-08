@@ -46,8 +46,9 @@ export default function Home() {
     const [mounted, setMounted] = useState(false);
     const [searchFocused, setSearchFocused] = useState(false);
     const searchRef = useRef<HTMLDivElement>(null);
+    const ctaRef = useRef<HTMLElement>(null);
 
-    // Live search filtering
+
     const searchResults = useMemo(() => {
         if (!query.trim() || query.length < 2) return { courses: [], files: [] };
 
@@ -233,8 +234,7 @@ export default function Home() {
 
                             <div className="flex flex-col sm:flex-row gap-4 pt-4">
                                 <Button size="lg" className="h-14 px-8 text-lg rounded-xl bg-blue-600 hover:bg-blue-700 hover:scale-105 transition-all duration-300 shadow-lg shadow-blue-600/20" onClick={() => {
-                                    searchRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
-                                    setSearchFocused(true);
+                                    ctaRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
                                 }}>
                                     Hemen Başla
                                 </Button>
@@ -430,7 +430,7 @@ export default function Home() {
                 </section>
 
                 {/* CTA Section */}
-                <section className="container mx-auto px-4 py-24">
+                <section ref={ctaRef} className="container mx-auto px-4 py-24">
                     <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-blue-600 to-blue-800 px-6 py-20 text-center shadow-2xl">
                         {/* Background Effects */}
                         <div className="absolute top-0 left-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2 animate-pulse" />

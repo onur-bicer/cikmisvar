@@ -17,7 +17,8 @@ interface FileState {
         examType?: string;
         sort?: string;
     }) => Promise<void>;
-    refreshFiles: () => Promise<void>;
+    incrementView: (fileId: string) => Promise<void>;
+    incrementDownload: (fileId: string) => Promise<void>;
 }
 
 export const useFileStore = create<FileState>((set, get) => ({
@@ -109,5 +110,35 @@ export const useFileStore = create<FileState>((set, get) => ({
 
     refreshFiles: async () => {
         await get().fetchFiles();
+    },
+
+    incrementView: async (fileId) => {
+        // Optimistic update
+        set((state) => ({
+            files: state.files.map((file) =>
+                file.id === fileId ? { ...file, viewCount: (file.viewCount || 0) + 1 } : file
+            )
+        }));
+
+        try {
+            await fetch(`/api/files/${fileId}/view`, { method: "POST" });
+        } catch (error) {
+            console.error("Failed to increment view count:", error);
+        }
+    },
+
+    incrementDownload: async (fileId) => {
+        // Optimistic update
+        set((state) => ({
+            files: state.files.map((file) =>
+                file.id === fileId ? { ...file, downloadCount: (file.downloadCount || 0) + 1 } : file
+            )
+        }));
+
+        try {
+            await fetch(`/api/files/${fileId}/download`, { method: "POST" });
+        } catch (error) {
+            console.error("Failed to increment download count:", error);
+        }
     }
 }));
