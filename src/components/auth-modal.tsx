@@ -201,7 +201,7 @@ export function AuthModal() {
                                 {loading ? "Giriş yapılıyor..." : "Giriş Yap"}
                             </Button>
                         </form>
-                        <div className="relative my-4">
+                        {/*                         <div className="relative my-4">
                             <div className="absolute inset-0 flex items-center">
                                 <span className="w-full border-t" />
                             </div>
@@ -212,7 +212,7 @@ export function AuthModal() {
                         <Button variant="outline" className="w-full h-11 border-border/50 hover:bg-muted/50 transition-all duration-200" type="button" onClick={onGoogleAuth} disabled={loading}>
                             <GoogleIcon />
                             Google ile Giriş Yap
-                        </Button>
+                        </Button> */}
                     </TabsContent>
 
                     <TabsContent value="register" className="space-y-4 pt-4">
@@ -242,7 +242,7 @@ export function AuthModal() {
                                 {loading ? "Kayıt olunuyor..." : "Kayıt Ol"}
                             </Button>
                         </form>
-                        <div className="relative my-4">
+                        {/*                         <div className="relative my-4">
                             <div className="absolute inset-0 flex items-center">
                                 <span className="w-full border-t" />
                             </div>
@@ -253,7 +253,7 @@ export function AuthModal() {
                         <Button variant="outline" className="w-full h-11 border-border/50 hover:bg-muted/50 transition-all duration-200" type="button" onClick={onGoogleAuth} disabled={loading}>
                             <GoogleIcon />
                             Google ile Kaydol
-                        </Button>
+                        </Button> */}
                     </TabsContent>
                 </Tabs>
             </DialogContent>
