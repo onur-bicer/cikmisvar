@@ -29,7 +29,7 @@ export default function Home() {
     const searchRef = useRef<HTMLDivElement>(null);
 
     // Get popular courses (mock logic: just take first few courses from first uni)
-    const popularCourses = universities[0].departments[0].courses.slice(0, 4);
+    const popularCourses = universities[0]?.departments[0]?.courses?.slice(0, 4) || [];
 
     // Live search filtering
     const searchResults = useMemo(() => {
@@ -56,9 +56,9 @@ export default function Home() {
 
         // Search files
         const matchedFiles = files.filter(file =>
-            file.courseName.toLowerCase().includes(normalizedQuery) ||
-            file.universityName.toLowerCase().includes(normalizedQuery) ||
-            file.departmentName.toLowerCase().includes(normalizedQuery)
+            file.courseName?.toLowerCase().includes(normalizedQuery) ||
+            file.universityName?.toLowerCase().includes(normalizedQuery) ||
+            file.departmentName?.toLowerCase().includes(normalizedQuery)
         ).slice(0, 5);
 
         return { courses: matchedCourses.slice(0, 5), files: matchedFiles };
@@ -80,7 +80,8 @@ export default function Home() {
     useEffect(() => {
         setMounted(true);
         fetchFiles(); // Fetch files from database on mount
-    }, [fetchFiles]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();

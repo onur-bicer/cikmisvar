@@ -111,7 +111,8 @@ export default function ContentsPage() {
         }
         // Fetch files on mount
         fetchFiles();
-    }, [searchParams, setQuery, fetchFiles]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     // Filter and Sort logic
     const filteredFiles = useMemo(() => {
