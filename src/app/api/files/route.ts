@@ -7,6 +7,7 @@ import { v4 as uuidv4 } from "uuid";
 
 // GET /api/files - Search and Filter
 export async function GET(req: Request) {
+    const session = await getServerSession(authOptions);
     const { searchParams } = new URL(req.url);
     const q = searchParams.get("q");
     const universityId = searchParams.get("universityId");
