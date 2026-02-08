@@ -3,13 +3,13 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Button } from "@/components/ui/button";
 import { useModalStore, useFileStore } from "@/store";
 import { formatFileSize, formatExamType } from "@/lib/utils";
-import { Download, Trash2, Loader2 } from "lucide-react";
+import { Download, Trash2, Loader2, X } from "lucide-react";
 import { CommentSection } from "@/components/comment-section";
 import { useSession } from "next-auth/react";
 import { useToast } from "@/components/ui/use-toast";
 
 export function PreviewModal() {
-    const { previewModalOpen, previewFileId, closePreviewModal } = useModalStore();
+    const { previewModalOpen, previewFileId, closePreviewModal, openAuthModal } = useModalStore();
     const { files, setFiles } = useFileStore();
     const { data: session } = useSession();
     const user = session?.user as any;
@@ -112,6 +112,10 @@ export function PreviewModal() {
                                 <Download className="h-4 w-4" />
                                 <span className="hidden sm:inline">İndir</span>
                             </a>
+                        </Button>
+                        <Button variant="ghost" size="sm" className="gap-2" onClick={closePreviewModal}>
+                            <X className="h-4 w-4" />
+                            <span className="hidden sm:inline">Kapat</span>
                         </Button>
                     </div>
                 </DialogHeader>
