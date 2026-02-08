@@ -260,7 +260,7 @@ export default function Home() {
                                 Sınav hazırlığını kolaylaştır
                             </h2>
                             <p className="text-muted-foreground max-w-2xl mx-auto">
-                                Türkiye'nin en kapsamlı çıkmış soru arşivine ücretsiz eriş
+                                Türkiye&rsquo;nin en kapsamlı çıkmış soru arşivine ücretsiz eriş
                             </p>
                         </div>
 
