@@ -1,7 +1,7 @@
 
 import { Metadata } from "next";
 import Link from "next/link";
-import { LayoutDashboard, GraduationCap, Building2, BookOpen, FileText, Settings, LogOut } from "lucide-react";
+import { LayoutDashboard, GraduationCap, Building2, BookOpen, FileText, Settings, LogOut, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export const metadata: Metadata = {
@@ -52,6 +52,12 @@ export default function AdminLayout({
                         <Button variant="ghost" className="w-full justify-start gap-3">
                             <FileText className="h-4 w-4" />
                             Dosyalar
+                        </Button>
+                    </Link>
+                    <Link href="/admin/reports">
+                        <Button variant="ghost" className="w-full justify-start gap-3">
+                            <AlertTriangle className="h-4 w-4" />
+                            Raporlar
                         </Button>
                     </Link>
                     <Link href="/admin/users">

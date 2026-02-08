@@ -17,6 +17,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { useSession } from "next-auth/react";
 import { useModalStore, useSearchStore, useFileStore } from "@/store";
 import { formatFileSize, formatExamType } from "@/lib/utils";
+import { SearchableSelect } from "@/components/searchable-select";
 
 interface University {
     id: string;
@@ -71,37 +72,36 @@ export default function ContentsPage() {
         fetchUniversities();
     }, []);
 
-    // Fetch departments when university changes
+    // Fetch departments
     useEffect(() => {
-        if (selectedUniversityId) {
-            setLoadingData(true);
-            setDepartments([]);
-            setCourses([]);
+        setLoadingData(true);
+        const url = selectedUniversityId
+            ? `/api/departments?universityId=${selectedUniversityId}`
+            : "/api/departments";
 
-            fetch(`/api/universities?universityId=${selectedUniversityId}`)
-                .then(res => res.json())
-                .then(data => {
-                    setDepartments(data);
-                    setLoadingData(false);
-                })
-                .catch(() => setLoadingData(false));
-        }
+        fetch(url)
+            .then(res => res.json())
+            .then(data => {
+                setDepartments(data);
+                setLoadingData(false);
+            })
+            .catch(() => setLoadingData(false));
     }, [selectedUniversityId]);
 
-    // Fetch courses when department changes
+    // Fetch courses
     useEffect(() => {
-        if (selectedDepartmentId) {
-            setLoadingData(true);
-            setCourses([]);
+        setLoadingData(true);
+        const url = selectedDepartmentId
+            ? `/api/courses?departmentId=${selectedDepartmentId}`
+            : "/api/courses";
 
-            fetch(`/api/universities?departmentId=${selectedDepartmentId}`)
-                .then(res => res.json())
-                .then(data => {
-                    setCourses(data);
-                    setLoadingData(false);
-                })
-                .catch(() => setLoadingData(false));
-        }
+        fetch(url)
+            .then(res => res.json())
+            .then(data => {
+                setCourses(data);
+                setLoadingData(false);
+            })
+            .catch(() => setLoadingData(false));
     }, [selectedDepartmentId]);
 
     // Initialize from URL params if present
@@ -193,45 +193,36 @@ export default function ContentsPage() {
                                 </div>
 
                                 <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 items-center">
-                                    <Select value={selectedUniversityId} onValueChange={(val) => {
-                                        setUniversity(val);
-                                        setDepartment("");
-                                        setCourse("");
-                                    }}>
-                                        <SelectTrigger className="bg-background">
-                                            <SelectValue placeholder="Üniversite" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            {universities.map(u => (
-                                                <SelectItem key={u.id} value={u.id}>{u.name}</SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
+                                    <SearchableSelect
+                                        options={universities.map(u => ({ value: u.id, label: u.name }))}
+                                        value={selectedUniversityId}
+                                        onValueChange={(val) => {
+                                            setUniversity(val);
+                                            // Optional: reset child filters if they are not allowed to stay
+                                            // setDepartment("");
+                                            // setCourse("");
+                                        }}
+                                        placeholder="Üniversite"
+                                    />
 
-                                    <Select value={selectedDepartmentId} onValueChange={(val) => {
-                                        setDepartment(val);
-                                        setCourse("");
-                                    }} disabled={!selectedUniversityId || loadingData}>
-                                        <SelectTrigger className="bg-background">
-                                            <SelectValue placeholder={loadingData ? "Yükleniyor..." : "Bölüm"} />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            {departments.map(d => (
-                                                <SelectItem key={d.id} value={d.id}>{d.name}</SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
+                                    <SearchableSelect
+                                        options={departments.map(d => ({ value: d.id, label: d.name }))}
+                                        value={selectedDepartmentId}
+                                        onValueChange={(val) => {
+                                            setDepartment(val);
+                                            // setCourse("");
+                                        }}
+                                        placeholder="Bölüm"
+                                        disabled={loadingData}
+                                    />
 
-                                    <Select value={selectedCourseId} onValueChange={setCourse} disabled={!selectedDepartmentId || loadingData}>
-                                        <SelectTrigger className="bg-background">
-                                            <SelectValue placeholder={loadingData ? "Yükleniyor..." : "Ders"} />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            {courses.map(c => (
-                                                <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
+                                    <SearchableSelect
+                                        options={courses.map(c => ({ value: c.id, label: c.name }))}
+                                        value={selectedCourseId}
+                                        onValueChange={setCourse}
+                                        placeholder="Ders"
+                                        disabled={loadingData}
+                                    />
 
                                     <Input
                                         type="number"

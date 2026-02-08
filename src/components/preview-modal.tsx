@@ -3,7 +3,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Button } from "@/components/ui/button";
 import { useModalStore, useFileStore } from "@/store";
 import { formatFileSize, formatExamType } from "@/lib/utils";
-import { Download, Trash2, Loader2, X } from "lucide-react";
+import { Download, Trash2, Loader2, X, Flag, AlertTriangle } from "lucide-react";
 import { CommentSection } from "@/components/comment-section";
 import { useSession } from "next-auth/react";
 import { useToast } from "@/components/ui/use-toast";
@@ -15,6 +15,9 @@ export function PreviewModal() {
     const user = session?.user as any;
     const { toast } = useToast();
     const [deleting, setDeleting] = useState(false);
+    const [reporting, setReporting] = useState(false);
+    const [reportReason, setReportReason] = useState("");
+    const [showReportForm, setShowReportForm] = useState(false);
 
     const file = files.find((f) => f.id === previewFileId);
 
@@ -55,6 +58,42 @@ export function PreviewModal() {
             });
         } finally {
             setDeleting(false);
+        }
+    };
+
+    const handleReport = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!reportReason.trim()) return;
+
+        setReporting(true);
+        try {
+            const res = await fetch("/api/reports", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    fileId: file.id,
+                    reason: reportReason,
+                }),
+            });
+
+            if (res.ok) {
+                toast({
+                    title: "Rapor gönderildi",
+                    description: "Geri bildiriminiz için teşekkürler. İnceleyeceğiz.",
+                });
+                setShowReportForm(false);
+                setReportReason("");
+            } else {
+                throw new Error("Failed to report");
+            }
+        } catch (error) {
+            toast({
+                title: "Hata",
+                description: "Rapor gönderilirken bir hata oluştu.",
+                variant: "destructive",
+            });
+        } finally {
+            setReporting(false);
         }
     };
 
@@ -113,6 +152,15 @@ export function PreviewModal() {
                                 <span className="hidden sm:inline">İndir</span>
                             </a>
                         </Button>
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            className="gap-2 text-muted-foreground hover:text-destructive"
+                            onClick={() => setShowReportForm(true)}
+                        >
+                            <Flag className="h-4 w-4" />
+                            <span className="hidden sm:inline">Rapor Et</span>
+                        </Button>
                         <Button variant="ghost" size="sm" className="gap-2" onClick={closePreviewModal}>
                             <X className="h-4 w-4" />
                             <span className="hidden sm:inline">Kapat</span>
@@ -146,6 +194,34 @@ export function PreviewModal() {
                     <div className="w-full lg:w-[320px] xl:w-[380px] h-[50vh] lg:h-full flex-shrink-0 bg-background">
                         <CommentSection fileId={file.id} />
                     </div>
+
+                    {/* Report Form Overlay */}
+                    {showReportForm && (
+                        <div className="absolute inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center p-4">
+                            <form onSubmit={handleReport} className="bg-background border rounded-lg shadow-xl p-6 w-full max-w-md space-y-4">
+                                <div className="flex items-center gap-2 text-destructive">
+                                    <AlertTriangle className="h-5 w-5" />
+                                    <h3 className="font-semibold text-lg">Dosyayı Rapor Et</h3>
+                                </div>
+                                <p className="text-sm text-muted-foreground">
+                                    Bu dosya ile ilgili bir sorun mu var? Lütfen nedeninizi kısaca açıklayın.
+                                </p>
+                                <textarea
+                                    className="w-full min-h-[100px] p-3 text-sm rounded-md border bg-muted/50 focus:outline-none focus:ring-2 focus:ring-primary/20"
+                                    placeholder="Hatalı dosya, kopya içerik, telif vb..."
+                                    value={reportReason}
+                                    onChange={(e) => setReportReason(e.target.value)}
+                                    required
+                                />
+                                <div className="flex gap-2 justify-end">
+                                    <Button type="button" variant="ghost" onClick={() => setShowReportForm(false)}>Vazgeç</Button>
+                                    <Button type="submit" variant="destructive" disabled={reporting}>
+                                        {reporting ? "Gönderiliyor..." : "Raporu Gönder"}
+                                    </Button>
+                                </div>
+                            </form>
+                        </div>
+                    )}
                 </div>
             </DialogContent>
         </Dialog>

@@ -3,20 +3,20 @@ import { prisma } from "@/lib/prisma";
 
 export async function GET(req: Request) {
     const { searchParams } = new URL(req.url);
+    const q = searchParams.get("q");
     const departmentId = searchParams.get("departmentId");
 
-    if (!departmentId) {
-        return NextResponse.json(
-            { message: "departmentId is required" },
-            { status: 400 }
-        );
-    }
-
     try {
+        const where: any = {};
+        if (departmentId) {
+            where.departmentId = departmentId;
+        }
+        if (q) {
+            where.name = { contains: q, mode: "insensitive" };
+        }
+
         const courses = await prisma.course.findMany({
-            where: {
-                departmentId,
-            },
+            where,
             select: {
                 id: true,
                 name: true,
