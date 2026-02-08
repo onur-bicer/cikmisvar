@@ -8,7 +8,15 @@ interface FileState {
     addFile: (file: ExamFile) => void;
     addComment: (fileId: string, comment: any) => void;
     toggleFavorite: (fileId: string) => Promise<void>;
-    fetchFiles: (query?: string) => Promise<void>;
+    fetchFiles: (filters?: {
+        q?: string;
+        universityId?: string;
+        departmentId?: string;
+        courseId?: string;
+        year?: string;
+        examType?: string;
+        sort?: string;
+    }) => Promise<void>;
     refreshFiles: () => Promise<void>;
 }
 
@@ -63,10 +71,29 @@ export const useFileStore = create<FileState>((set, get) => ({
         }
     },
 
-    fetchFiles: async (query?: string) => {
+    fetchFiles: async (filters?: {
+        q?: string;
+        universityId?: string;
+        departmentId?: string;
+        courseId?: string;
+        year?: string;
+        examType?: string;
+        sort?: string;
+    }) => {
         set({ loading: true });
         try {
-            const url = query ? `/api/files?q=${encodeURIComponent(query)}` : "/api/files";
+            const params = new URLSearchParams();
+            if (filters) {
+                if (filters.q) params.append("q", filters.q);
+                if (filters.universityId) params.append("universityId", filters.universityId);
+                if (filters.departmentId) params.append("departmentId", filters.departmentId);
+                if (filters.courseId) params.append("courseId", filters.courseId);
+                if (filters.year) params.append("year", filters.year);
+                if (filters.examType) params.append("examType", filters.examType);
+                if (filters.sort) params.append("sort", filters.sort);
+            }
+
+            const url = filters ? `/api/files?${params.toString()}` : "/api/files";
             const response = await fetch(url);
             if (response.ok) {
                 const data = await response.json();

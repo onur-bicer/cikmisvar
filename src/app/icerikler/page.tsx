@@ -104,49 +104,39 @@ export default function ContentsPage() {
             .catch(() => setLoadingData(false));
     }, [selectedDepartmentId]);
 
-    // Initialize from URL params if present
+    // Fetch files when filters change
+    useEffect(() => {
+        const timeoutId = setTimeout(() => {
+            fetchFiles({
+                q: query,
+                universityId: selectedUniversityId,
+                departmentId: selectedDepartmentId,
+                courseId: selectedCourseId,
+                year: year,
+                examType: examType,
+                sort: searchParams.get("sort") || "recent"
+            });
+        }, 300); // Debounce
+
+        return () => clearTimeout(timeoutId);
+    }, [query, selectedUniversityId, selectedDepartmentId, selectedCourseId, year, examType, searchParams, fetchFiles]);
+
+    // Initialize from URL params if present (and fetch initial)
     useEffect(() => {
         setMounted(true);
         const initialQuery = searchParams.get("q");
         if (initialQuery) {
             setQuery(initialQuery);
         }
-        // Fetch files on mount
-        fetchFiles();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+        // Initial fetch is handled by the filter effect above effectively, 
+        // but we might want to ensure it runs once if filters are empty.
+        // The dependency array above includes all filters, so it will run on mount.
+        // However, we need to be careful about double fetching.
+        // Let's rely on the effect above.
+    }, [searchParams, setQuery]);
 
-    // Filter and Sort logic
-    const filteredFiles = useMemo(() => {
-        const sortParam = searchParams.get("sort");
-
-        let result = files.filter(file => {
-            const matchesQuery = query
-                ? file.courseName.toLowerCase().includes(query.toLowerCase()) ||
-                file.universityName.toLowerCase().includes(query.toLowerCase())
-                : true;
-
-            const matchesUni = selectedUniversityId ? file.universityId === selectedUniversityId : true;
-            const matchesDepartment = selectedDepartmentId ? file.departmentId === selectedDepartmentId : true;
-            const matchesCourse = selectedCourseId ? file.courseId === selectedCourseId : true;
-            const matchesYear = year ? file.year.toString() === year : true;
-            const matchesType = examType ? file.examType === examType : true;
-
-            return matchesQuery && matchesUni && matchesDepartment && matchesCourse && matchesYear && matchesType;
-        });
-
-        // Sorting
-        if (sortParam === "popular") {
-            result.sort((a, b) => b.viewCount - a.viewCount);
-        } else if (sortParam === "recent") {
-            result.sort((a, b) => new Date(b.uploadedAt).getTime() - new Date(a.uploadedAt).getTime());
-        } else {
-            // Default to recent
-            result.sort((a, b) => new Date(b.uploadedAt).getTime() - new Date(a.uploadedAt).getTime());
-        }
-
-        return result;
-    }, [query, selectedUniversityId, selectedDepartmentId, selectedCourseId, year, examType, searchParams, files]);
+    // Use files directly from store (no client-side filtering)
+    const filteredFiles = files;
 
     if (!mounted) return null;
 

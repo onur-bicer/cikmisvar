@@ -103,7 +103,7 @@ model File {
   fileSize       Int
   views          Int        @default(0)
   uploaderId     String
-  uploader       User       @relation(fields: [uploaderId], references: [id])
+  uploader       User       @relation(fields: [uploaderId], references: [id], onDelete: Cascade)
   status         String     @default("pending") // pending, approved
   createdAt      DateTime   @default(now())
   favorites      Favorite[]
@@ -113,7 +113,7 @@ model File {
 
 model Favorite {
   userId String
-  user   User   @relation(fields: [userId], references: [id])
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   fileId String
   file   File   @relation(fields: [fileId], references: [id], onDelete: Cascade)
 
@@ -137,7 +137,7 @@ model Comment {
   fileId    String
   file      File     @relation(fields: [fileId], references: [id], onDelete: Cascade)
   userId    String
-  user      User     @relation(fields: [userId], references: [id])
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
 }
 
@@ -145,7 +145,7 @@ model SearchHistory {
   id        String   @id @default(cuid())
   term      String
   userId    String?
-  user      User?    @relation(fields: [userId], references: [id])
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
   ipAddress String?
   createdAt DateTime @default(now())
 }
