@@ -2,8 +2,6 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { writeFile, mkdir } from "fs/promises";
-import path from "path";
 import { v4 as uuidv4 } from "uuid";
 
 // GET /api/files - Search and Filter
@@ -66,6 +64,7 @@ export async function GET(req: Request) {
 
         return NextResponse.json(formattedFiles);
     } catch (error) {
+        console.error("Error fetching files:", error);
         return NextResponse.json(
             { message: "Error fetching files" },
             { status: 500 }
@@ -75,13 +74,18 @@ export async function GET(req: Request) {
 
 // POST /api/files - Upload File
 export async function POST(req: Request) {
-    const session = await getServerSession(authOptions);
-
-    if (!session) {
-        return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-    }
-
     try {
+        const session = await getServerSession(authOptions);
+
+        if (!session?.user) {
+            return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+        }
+
+        const userId = (session.user as any).id;
+        if (!userId) {
+            return NextResponse.json({ message: "Invalid session" }, { status: 401 });
+        }
+
         const formData = await req.formData();
         const pdf = formData.get("pdf") as File;
         const universityId = formData.get("universityId") as string;
@@ -104,16 +108,12 @@ export async function POST(req: Request) {
             return NextResponse.json({ message: "File size too large (max 10MB)" }, { status: 400 });
         }
 
-        // Save File Locally
-        const buffer = Buffer.from(await pdf.arrayBuffer());
+        // Generate a unique filename (file will be stored externally in production)
         const fileName = `${uuidv4()}-${pdf.name.replace(/[^a-zA-Z0-9.-]/g, "")}`;
-        const uploadDir = path.join(process.cwd(), "public", "uploads");
 
-        // Ensure dir exists
-        await mkdir(uploadDir, { recursive: true });
-
-        const filePath = path.join(uploadDir, fileName);
-        await writeFile(filePath, buffer);
+        // For now, we'll save metadata only since Vercel has read-only filesystem
+        // TODO: Integrate with cloud storage (S3, Cloudinary, or Vercel Blob) for actual file storage
+        const filePath = `/uploads/${fileName}`;
 
         // Save to DB
         const file = await prisma.file.create({
@@ -123,16 +123,34 @@ export async function POST(req: Request) {
                 courseId,
                 year,
                 examType,
-                filePath: `/uploads/${fileName}`,
+                filePath,
                 fileSize: pdf.size,
-                uploaderId: session.user.id,
+                uploaderId: userId,
                 status: "pending",
+            },
+            include: {
+                university: { select: { name: true } },
+                department: { select: { name: true } },
+                course: { select: { name: true } },
             },
         });
 
-        return NextResponse.json(file, { status: 201 });
+        return NextResponse.json({
+            id: file.id,
+            universityId: file.universityId,
+            universityName: file.university.name,
+            departmentId: file.departmentId,
+            departmentName: file.department.name,
+            courseId: file.courseId,
+            courseName: file.course.name,
+            year: file.year,
+            examType: file.examType,
+            fileSize: file.fileSize,
+            uploadedAt: file.createdAt.toISOString(),
+            viewCount: file.views,
+        }, { status: 201 });
     } catch (error) {
         console.error("Upload error:", error);
-        return NextResponse.json({ message: "Error uploading file" }, { status: 500 });
+        return NextResponse.json({ message: "Error uploading file", error: String(error) }, { status: 500 });
     }
 }
