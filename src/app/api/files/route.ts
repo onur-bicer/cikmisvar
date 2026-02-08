@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { put } from "@vercel/blob";
 import { v4 as uuidv4 } from "uuid";
 
 // GET /api/files - Search and Filter
@@ -60,6 +61,7 @@ export async function GET(req: Request) {
             fileSize: file.fileSize,
             uploadedAt: file.createdAt.toISOString(),
             viewCount: file.views,
+            previewUrl: file.filePath, // Blob URL for preview
         }));
 
         return NextResponse.json(formattedFiles);
@@ -108,14 +110,16 @@ export async function POST(req: Request) {
             return NextResponse.json({ message: "File size too large (max 10MB)" }, { status: 400 });
         }
 
-        // Generate a unique filename (file will be stored externally in production)
+        // Generate a unique filename
         const fileName = `${uuidv4()}-${pdf.name.replace(/[^a-zA-Z0-9.-]/g, "")}`;
 
-        // For now, we'll save metadata only since Vercel has read-only filesystem
-        // TODO: Integrate with cloud storage (S3, Cloudinary, or Vercel Blob) for actual file storage
-        const filePath = `/uploads/${fileName}`;
+        // Upload to Vercel Blob
+        const blob = await put(`exams/${fileName}`, pdf, {
+            access: "public",
+            contentType: "application/pdf",
+        });
 
-        // Save to DB
+        // Save to DB with blob URL
         const file = await prisma.file.create({
             data: {
                 universityId,
@@ -123,7 +127,7 @@ export async function POST(req: Request) {
                 courseId,
                 year,
                 examType,
-                filePath,
+                filePath: blob.url, // Store the blob URL
                 fileSize: pdf.size,
                 uploaderId: userId,
                 status: "pending",
@@ -148,6 +152,7 @@ export async function POST(req: Request) {
             fileSize: file.fileSize,
             uploadedAt: file.createdAt.toISOString(),
             viewCount: file.views,
+            previewUrl: blob.url,
         }, { status: 201 });
     } catch (error) {
         console.error("Upload error:", error);
