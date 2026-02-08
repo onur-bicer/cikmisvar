@@ -40,24 +40,38 @@ export async function GET(req: Request) {
 
 // POST /api/comments - Add a comment
 export async function POST(req: Request) {
-    const session = await getServerSession(authOptions);
-
-    if (!session?.user) {
-        return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-    }
-
     try {
+        const session = await getServerSession(authOptions);
+
+        if (!session?.user) {
+            return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+        }
+
+        // Get user id from session (added via callbacks in auth.ts)
+        const userId = (session.user as any).id;
+
+        if (!userId) {
+            console.error("No user id in session:", session);
+            return NextResponse.json({ message: "Invalid session" }, { status: 401 });
+        }
+
         const { fileId, text } = await req.json();
 
         if (!fileId || !text?.trim()) {
             return NextResponse.json({ message: "fileId and text are required" }, { status: 400 });
         }
 
+        // Verify the file exists
+        const fileExists = await prisma.file.findUnique({ where: { id: fileId } });
+        if (!fileExists) {
+            return NextResponse.json({ message: "File not found" }, { status: 404 });
+        }
+
         const comment = await prisma.comment.create({
             data: {
                 text: text.trim(),
                 fileId,
-                userId: session.user.id
+                userId
             },
             include: {
                 user: {
@@ -75,6 +89,7 @@ export async function POST(req: Request) {
         }, { status: 201 });
     } catch (error) {
         console.error("Error creating comment:", error);
-        return NextResponse.json({ message: "Error creating comment" }, { status: 500 });
+        return NextResponse.json({ message: "Error creating comment", error: String(error) }, { status: 500 });
     }
 }
+
